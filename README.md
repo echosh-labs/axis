@@ -1,57 +1,39 @@
-# axis
+# axis-mundi
 
-High-performance orchestration engine for agentic AI and Google Workspace integration. This repository serves as the technical core for **https://www.google.com/search?q=echosh-labs.com**, bridging local terminal execution with cloud-scale automation.
+Unified command-center for Google Workspace automation and strategic triage.
 
-## Core Technical Facets
+## Features
 
-### Agentic AI Architecture
+* **Hybrid TUI**: Keyboard-centric React terminal for browser-based management.
+* **Workspace Integration**: Native Go implementation for Google Keep and Admin Directory APIs.
+* **Service Account Impersonation**: Secure delegation using domain-wide credentials.
+* **Gemini AI Synthesis**: Integrated LLM analysis for note content and workspace summaries.
+* **Dual Operation Modes**:
+    * **AUTO**: Cyclical background retraction and telemetry monitoring.
+    * **MANUAL**: Precise keyboard navigation, inspection, and object purging.
 
-* **State Management**: Distributed state synchronization between local Electron processes and cloud-hosted Go binaries.
+## Architecture
 
-* **Context Awareness**: Deep integration with local file systems and system processes via Electron's IPC bridge.
+* **Backend**: Go (cmd/axis), `google.golang.org/api`.
+* **Frontend**: React, Tailwind CSS, hosted via Go `net/http` server.
+* **Intelligence**: Gemini 2.5 Flash API for agentic insights.
 
-* **Autonomous Execution**: Low-latency command dispatching for AI-driven system manipulation.
+## Setup
 
-* **Tooling**: Extensible Go-based toolsets for agent interaction with external environments.
+1. Configure GCP Service Account with Domain-Wide Delegation and required scopes (`keep`, `admin.directory.user`).
+2. Populate `.env` with:
+    * `ADMIN_EMAIL`
+    * `SERVICE_ACCOUNT_EMAIL`
+    * `TEST_USER_EMAIL`
+3. Execute `go mod tidy` to resolve dependencies.
+4. Ensure `web/dist/index.html` contains the React TUI source.
 
-### Google Workspace Integration
+## Interaction Schema
 
-* **Service Orchestration**: High-level Go wrappers for Google Drive, Calendar, and Gmail API.
-
-* **Identity Management**: Secure OAuth2 and Service Account handling for multi-tenant workspace operations.
-
-* **GCP Infrastructure**: Managed deployment of agentic microservices using Google Cloud Run and Firestore.
-
-* **Real-time Synchronization**: Webhook-driven event listeners for immediate workspace state updates.
-
-## Technical Stack
-
-* **Logic**: Go 1.22+ (Concurrency, API Wrappers)
-
-* **Frontend/Dashboard**: Next.js 15 (App Router, Tailwind CSS)
-
-* **Native Runtime**: Electron (Terminal Interface, Hardware Access)
-
-* **Deployment**: Vercel (Web), GCP (Services)
-
-## Getting Started
-
-### Prerequisites
-
-* Node.js (LTS)
-
-* Go 1.22+
-
-* Google Cloud SDK (configured)
-
-### Development
-
-1. **Dependencies**:
-2. **Launch Web Interface**:
-3. **Launch Terminal Interface**:
-
-## Next Steps
-
-* Initialize Go Workspace API client structure in `/cmd/api`.
-
-Determined
+* **[A]**: Enable AUTO Mode (Background Polling).
+* **[M]**: Enable MANUAL Mode (Keyboard Navigation).
+* **[R]**: Trigger Manual Registry Refresh.
+* **[Arrows]**: Navigate registry list.
+* **[Enter/Space]**: Inspect raw object data.
+* **[Delete]**: Purge selected object.
+* **[Esc]**: Close detail view.
