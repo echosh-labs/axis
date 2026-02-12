@@ -1,5 +1,5 @@
 # Documentation: .github/workflows/deploy.yml
-# Automates the build and deployment of web artifacts to a gh-pages branch.
+# Updated to target the 'web' subdirectory for build artifacts.
 name: Build and Deploy
 
 on:
@@ -21,8 +21,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: web/package-lock.json
 
       - name: Install and Build
+        working-directory: ./web
         run: |
           npm ci
           npm run build
@@ -31,4 +33,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./web/dist
