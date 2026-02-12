@@ -9,12 +9,15 @@ implementation, Tailwind styling, and Gemini API integration.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>axis-mundi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #050505; color: #9ca3af; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; overflow: hidden; }
+        body { background-color: #050505; color: #9ca3af; font-family: 'Space Grotesk', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; overflow: hidden; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes shimmer {
@@ -30,6 +33,62 @@ implementation, Tailwind styling, and Gemini API integration.
     <script type="text/babel">
         const { useState, useEffect, useRef, useMemo } = React;
         const apiKey = ""; // Set by environment
+
+        const SnipersBox = () => {
+            const [bid, setBid] = useState(145.5);
+            const [timeLeft, setTimeLeft] = useState(45);
+            const windowSeconds = 45;
+
+            useEffect(() => {
+                if (timeLeft === 0) return;
+                const timer = setInterval(() => {
+                    setTimeLeft(prev => Math.max(prev - 1, 0));
+                }, 1000);
+                return () => clearInterval(timer);
+            }, [timeLeft]);
+
+            useEffect(() => {
+                if (timeLeft === 0) {
+                    const timeout = setTimeout(() => setTimeLeft(windowSeconds), 4000);
+                    return () => clearTimeout(timeout);
+                }
+            }, [timeLeft]);
+
+            const handleBid = () => {
+                setBid(prev => Number((prev + 5).toFixed(2)));
+                setTimeLeft(windowSeconds);
+            };
+
+            const progress = Math.max(0, (timeLeft / windowSeconds) * 100);
+            const highAlert = timeLeft <= 10;
+
+            return (
+                <div className="flex flex-col border border-emerald-500/40 bg-gradient-to-br from-black via-slate-900 to-emerald-950 p-4 rounded basis-[35%] min-h-[230px] shadow-[0_0_30px_rgba(16,185,129,0.2)] text-[11px] relative overflow-hidden">
+                    <div className="text-[10px] text-emerald-400 font-bold tracking-[0.5em] mb-2">SNIPER'S BOX</div>
+                    <div className="text-xs text-gray-300 mb-4">
+                        Target Acquisition: <span className="text-emerald-200 font-semibold">Vintage Lens</span>
+                    </div>
+                    <div className="flex items-end justify-between mb-3">
+                        <div>
+                            <div className="text-[10px] text-gray-500 uppercase">Current Bid</div>
+                            <div className="text-3xl text-emerald-300 font-semibold leading-none">${bid.toFixed(2)}</div>
+                        </div>
+                        <div className={`text-base font-bold ${highAlert ? 'text-red-400' : 'text-emerald-200'}`}>
+                            T-{timeLeft}s
+                        </div>
+                    </div>
+                    <div className="h-1.5 rounded bg-emerald-900/40 mb-4 overflow-hidden">
+                        <div className="h-full bg-emerald-400 transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                    </div>
+                    <button 
+                        onClick={handleBid}
+                        className="mt-auto border border-emerald-400/60 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-100 font-bold uppercase tracking-[0.4em] py-2 transition-colors">
+                        SNIPE +$5.00
+                    </button>
+                    <div className="absolute inset-0 pointer-events-none border border-emerald-400/10 rounded [mask-image:radial-gradient(circle_at_center,rgba(255,255,255,0.4),transparent_70%)]"></div>
+                </div>
+            );
+        };
 
         const App = () => {
             const [mode, setMode] = useState('MANUAL');
@@ -259,18 +318,21 @@ implementation, Tailwind styling, and Gemini API integration.
                     </div>
 
                     <div className="flex flex-1 gap-4 overflow-hidden">
-                        <div className="w-1/2 flex flex-col border border-gray-900 bg-black/40 p-3 rounded">
-                            <div className="text-[9px] text-gray-600 mb-2 uppercase border-b border-gray-900 pb-1">Telemetry Buffer</div>
-                            <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-1 text-[11px] scrollbar-hide">
-                                {logs.map((log, i) => (
-                                    <div key={i} className="flex gap-2">
-                                        <span className="text-gray-700">[{log.timestamp}]</span>
-                                        <span className={log.type === 'error' ? 'text-red-500' : log.type === 'success' ? 'text-emerald-500' : 'text-gray-500'}>
-                                            {log.message}
-                                        </span>
-                                    </div>
-                                ))}
+                        <div className="w-1/2 flex flex-col gap-4">
+                            <div className="flex flex-col border border-gray-900 bg-black/40 p-3 rounded basis-[65%] max-h-[65%] min-h-[220px]">
+                                <div className="text-[9px] text-gray-600 mb-2 uppercase border-b border-gray-900 pb-1">Telemetry Buffer</div>
+                                <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-1 text-[11px] scrollbar-hide min-h-0">
+                                    {logs.map((log, i) => (
+                                        <div key={i} className="flex gap-2">
+                                            <span className="text-gray-700">[{log.timestamp}]</span>
+                                            <span className={log.type === 'error' ? 'text-red-500' : log.type === 'success' ? 'text-emerald-500' : 'text-gray-500'}>
+                                                {log.message}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
+                            <SnipersBox />
                         </div>
 
                         <div className="w-1/2 flex flex-col border border-gray-900 bg-black/40 p-3 rounded overflow-hidden">
