@@ -1,3 +1,8 @@
+/*
+File: internal/workspace/workspace.go
+Description: Core Workspace service wrapper. Provides structural definitions and
+initialization logic for interfacing with Google Admin and Keep APIs.
+*/
 package workspace
 
 import (
@@ -15,9 +20,9 @@ type Service struct {
 
 // User represents a simplified user structure
 type User struct {
-	Name  string
-	Email string
-	ID    string
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	ID    string `json:"id"`
 }
 
 // NewService creates a new workspace service wrapper

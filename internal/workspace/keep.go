@@ -1,3 +1,9 @@
+/*
+File: internal/workspace/keep.go
+Description: Implementation of Google Keep service logic. Handles note lifecycle
+management including listing, creation, retrieval, and deletion of notes
+and list items.
+*/
 package workspace
 
 import (
@@ -17,9 +23,9 @@ const (
 
 // Note represents a simplified Keep note
 type Note struct {
-	Title   string
-	Snippet string
-	ID      string
+	Title   string `json:"title"`
+	Snippet string `json:"snippet"`
+	ID      string `json:"id"`
 }
 
 var errKeepUnavailable = errors.New("google keep service is not configured")

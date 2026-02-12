@@ -1,3 +1,8 @@
+/*
+File: web/src/App.jsx
+Description: React terminal interface for Axis Mundi. Handles keyboard navigation, 
+real-time telemetry display, and note management with lowercase key binding.
+*/
 import { useState, useEffect, useRef, useMemo } from 'react';
 
 const App = () => {
@@ -15,7 +20,6 @@ const App = () => {
     const [connected, setConnected] = useState(false);
     const scrollRef = useRef(null);
 
-    // State Ref Pattern: Keeps the event listener stable while accessing fresh data
     const stateRef = useRef({ mode, selectedIndex, notes, showDetail });
     useEffect(() => {
         stateRef.current = { mode, selectedIndex, notes, showDetail };
@@ -79,7 +83,6 @@ const App = () => {
         }
     };
 
-    // User & Mode Init
     useEffect(() => {
         const init = async () => {
             try {
@@ -101,7 +104,6 @@ const App = () => {
         init();
     }, []);
 
-    // SSE Stream
     useEffect(() => {
         const es = new EventSource('/api/events');
         es.onopen = () => { setConnected(true); addLog('success', 'Uplink established (SSE).'); };
@@ -110,7 +112,6 @@ const App = () => {
                 const data = JSON.parse(e.data);
                 const list = Array.isArray(data) ? data : [];
                 setNotes(list);
-                // Auto-clamp index if list shrinks
                 setSelectedIndex(prev => {
                     if (list.length === 0) return 0;
                     return Math.min(prev, list.length - 1);
@@ -121,21 +122,17 @@ const App = () => {
         return () => { es.close(); setConnected(false); };
     }, []);
 
-    // Stable Keyboard Handler
     useEffect(() => {
         const handleKeyDown = (e) => {
             const { mode, selectedIndex, notes, showDetail } = stateRef.current;
             const key = e.key.toLowerCase();
 
-            // Global Shortcuts
             if (key === 'a') { syncMode('AUTO'); setShowDetail(false); return; }
             if (key === 'm') { syncMode('MANUAL'); return; }
             if (key === 'r') { fetchNotes(); return; }
 
-            // Manual Mode Only
             if (mode !== 'MANUAL') return;
 
-            // Escape Context
             if (showDetail && key === 'escape') {
                 setShowDetail(false);
                 setDetailNote(null);
@@ -144,7 +141,6 @@ const App = () => {
                 return;
             }
 
-            // Navigation
             switch (e.key) {
                 case 'ArrowDown':
                     e.preventDefault();
@@ -165,21 +161,20 @@ const App = () => {
                     const target = notes[selectedIndex];
                     if (target) {
                         setShowDetail(true);
-                        loadNoteDetail(target.ID);
+                        loadNoteDetail(target.id);
                     }
                     break;
                 case 'Delete':
                 case 'Backspace':
-                    if (notes[selectedIndex]) deleteNote(notes[selectedIndex].ID);
+                    if (notes[selectedIndex]) deleteNote(notes[selectedIndex].id);
                     break;
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []); // Empty dependency array = binds once
+    }, []);
 
-    // Helper: Content Formatting
     const formatNoteContent = useMemo(() => {
         const firstDefined = (obj, keys) => {
             if (!obj) return undefined;
@@ -191,32 +186,34 @@ const App = () => {
         const normalizeString = (value) => {
             if (typeof value === 'string') return value;
             if (!value) return '';
-            if (typeof value.Text === 'string') return value.Text;
             if (typeof value.text === 'string') return value.text;
+            if (typeof value.Text === 'string') return value.Text;
             if (typeof value.value === 'string') return value.value;
             return '';
         };
 
         return {
             fromNote(note) {
-                const section = firstDefined(note, ['Body', 'body']);
+                const section = firstDefined(note, ['body', 'Body']);
                 if (!section) return 'No body content.';
 
-                const text = normalizeString(firstDefined(section, ['Text', 'text']));
+                const text = normalizeString(firstDefined(section, ['text', 'Text']));
                 if (text.trim() !== '') return text;
 
-                const list = firstDefined(section, ['List', 'list']);
-                const items = Array.isArray(firstDefined(list, ['ListItems', 'listItems'])) ? firstDefined(list, ['ListItems', 'listItems']) : [];
+                const list = firstDefined(section, ['list', 'List']);
+                const itemsList = firstDefined(list, ['listItems', 'ListItems']);
+                const items = Array.isArray(itemsList) ? itemsList : [];
                 
                 if (items.length > 0) {
                     const lines = [];
                     const walk = (entries, depth) => {
                         entries.forEach((entry) => {
-                            const raw = normalizeString(firstDefined(entry, ['Text', 'text']));
+                            const raw = normalizeString(firstDefined(entry, ['text', 'Text']));
                             const label = raw.trim() === '' ? '[Empty]' : raw;
-                            const checked = entry?.Checked ? ' [x]' : '';
-                            lines.push(`${'  '.repeat(depth)}- ${label}${checked}`);
-                            const children = firstDefined(entry, ['ChildListItems', 'childListItems']);
+                            const isChecked = firstDefined(entry, ['checked', 'Checked']);
+                            const checkedMarker = isChecked ? ' [x]' : '';
+                            lines.push(`${'  '.repeat(depth)}- ${label}${checkedMarker}`);
+                            const children = firstDefined(entry, ['childListItems', 'ChildListItems']);
                             if (Array.isArray(children) && children.length > 0) walk(children, depth + 1);
                         });
                     };
@@ -281,17 +278,17 @@ const App = () => {
                     {!showDetail ? (
                         <div className="space-y-1 overflow-y-auto scrollbar-hide">
                             {notes.map((note, i) => (
-                                <div key={note.ID} className={`p-2 border transition-all ${i === selectedIndex && mode === 'MANUAL' ? 'bg-emerald-950/30 border-emerald-500 text-emerald-300' : 'border-transparent text-gray-600'}`}>
-                                    <div className="flex justify-between text-xs font-bold"><span>{note.Title}</span></div>
-                                    <div className="text-[10px] truncate italic">{note.Snippet}</div>
+                                <div key={note.id} className={`p-2 border transition-all ${i === selectedIndex && mode === 'MANUAL' ? 'bg-emerald-950/30 border-emerald-500 text-emerald-300' : 'border-transparent text-gray-600'}`}>
+                                    <div className="flex justify-between text-xs font-bold"><span>{note.title}</span></div>
+                                    <div className="text-[10px] truncate italic">{note.snippet}</div>
                                 </div>
                             ))}
                         </div>
                     ) : (
                         <div className="flex-1 flex flex-col overflow-hidden bg-black/60 p-2 border border-blue-900/30 rounded">
                             <div className="flex justify-between text-[10px] text-blue-400 mb-2 font-bold uppercase">
-                                <span>Detail: {notes[selectedIndex]?.Title || 'Unknown'}</span>
-                                <span onClick={() => { setShowDetail(false); setDetailNote(null); setDetailError(null); setDetailLoading(false); }}>[ESC] EXIT</span>
+                                <span>Detail: {notes[selectedIndex]?.title || 'Unknown'}</span>
+                                <span className="cursor-pointer" onClick={() => { setShowDetail(false); setDetailNote(null); setDetailError(null); setDetailLoading(false); }}>[ESC] EXIT</span>
                             </div>
                             {detailLoading && (
                                 <div className="flex-1 text-[10px] text-blue-300 overflow-auto scrollbar-hide bg-black/40 p-2">Loading note detail...</div>

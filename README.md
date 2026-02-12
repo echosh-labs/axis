@@ -1,99 +1,88 @@
-axis-mundi
+# axis-mundi
 
 Unified command-center for Google Workspace automation and strategic triage.
 
-Features
+## Features
 
-Hybrid TUI: Keyboard-centric React terminal for browser-based management.
+- **Hybrid TUI**: Keyboard-centric React terminal for browser-based management.
+- **Real-Time Uplink**: Server-Sent Events (SSE) for zero-latency registry updates in `AUTO` mode.
+- **State Persistence**: Server-side state tracking ensures operational mode survival across restarts.
+- **Workspace Integration**: Native Go implementation for Google Workspace APIs.
+- **Service Account Impersonation**: Secure delegation using domain-wide credentials.
 
-Real-Time Uplink: Server-Sent Events (SSE) for zero-latency registry updates in AUTO mode.
+### Dual Operation Modes
 
-State Persistence: Server-side state tracking ensures operational mode survival across restarts.
+- **AUTO**: Continuous background retraction and telemetry monitoring via SSE.
+- **MANUAL**: Precise keyboard navigation, inspection, and object purging.
 
-Workspace Integration: Native Go implementation for Google Workspace APIs.
+## Architecture
 
-Service Account Impersonation: Secure delegation using domain-wide credentials.
+- **Backend**: Go (1.24+)
+  - **Entry**: `cmd/axis`
+  - **Logic**: `internal/server` (HTTP/SSE), `internal/workspace` (Google APIs).
+- **Frontend**: React + Vite + Tailwind CSS
+  - **Source**: `web/src`
+  - **Build**: `web/dist` (Served statically by Go).
 
-Dual Operation Modes:
+## Setup
 
-AUTO: Continuous background retraction and telemetry monitoring via SSE.
+### Prerequisites
 
-MANUAL: Precise keyboard navigation, inspection, and object purging.
+- Go 1.24+
+- Node.js 18+ (for frontend build)
+- GCP Service Account with Domain-Wide Delegation (`keep`, `admin.directory.user`).
 
-Architecture
+### Environment
 
-Backend: Go (1.24+)
+Populate `.env` in the root directory:
 
-Entry: cmd/axis
-
-Logic: internal/server (HTTP/SSE), internal/workspace (Google APIs).
-
-Frontend: React + Vite + Tailwind CSS
-
-Source: web/src
-
-Build: web/dist (Served statically by Go).
-
-Setup
-
-Prerequisites
-
-Go 1.24+
-
-Node.js 18+ (for frontend build)
-
-GCP Service Account with Domain-Wide Delegation (keep, admin.directory.user).
-
-Environment
-
-Populate .env in the root directory:
-
+```env
 ADMIN_EMAIL=admin@example.com
 SERVICE_ACCOUNT_EMAIL=axis-agent@project-id.iam.gserviceaccount.com
 USER_EMAIL=target-user@example.com
 PORT=8080
+```
 
+### Installation
 
-Installation
+1. **Build Frontend**:
+   ```bash
+   cd web
+   npm install
+   npm run build
+   cd ..
+   ```
 
-Build Frontend:
+2. **Start Backend**:
+   ```bash
+   go mod tidy
+   go run ./cmd/axis
+   ```
 
-cd web
-npm install
-npm run build
-cd ..
+3. **Access**: Navigate to [http://localhost:8080](http://localhost:8080).
 
-
-Start Backend:
-
-go mod tidy
-go run ./cmd/axis
-
-
-Access: Navigate to http://localhost:8080.
-
-Development
+## Development
 
 For rapid UI development with Hot Module Replacement (HMR):
 
-Start Backend (Terminal 1): go run ./cmd/axis
+1. **Start Backend** (Terminal 1):
+   ```bash
+   go run ./cmd/axis
+   ```
 
-Start Frontend Proxy (Terminal 2): cd web && npm run dev
+2. **Start Frontend Proxy** (Terminal 2):
+   ```bash
+   cd web && npm run dev
+   ```
 
-Access via http://localhost:5173.
+3. **Access** via [http://localhost:5173](http://localhost:5173).
 
-Interaction Schema
+## Interaction Schema
 
-[A]: Enable AUTO Mode (Background Streaming).
-
-[M]: Enable MANUAL Mode (Interactive Control).
-
-[R]: Trigger Manual Registry Refresh.
-
-[Arrows]: Navigate registry list.
-
-[Enter/Space]: Inspect raw object data.
-
-[Delete]: Purge selected object.
-
-[Esc]: Close detail view.
+- `[A]`: Enable AUTO Mode (Background Streaming).
+- `[M]`: Enable MANUAL Mode (Interactive Control).
+- `[R]`: Trigger Manual Registry Refresh.
+- `[Arrows]`: Navigate registry list.
+- `[Enter/Space]`: Inspect raw object data.
+- `[Delete]`: Purge selected object.
+- `[Esc]`: Close detail view.

@@ -1,3 +1,9 @@
+/*
+File: internal/server/server.go
+Description: HTTP server implementation for Axis Mundi. Handles API routing,
+Server-Sent Events (SSE) for real-time telemetry, and persistent state management
+for operational modes.
+*/
 package server
 
 import (
