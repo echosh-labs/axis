@@ -1,5 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchJson } from '../utils/fetchJson';
+import {
+    getMode,
+    setMode as apiSetMode,
+    getRegistry as apiGetRegistry,
+    getDetail as apiGetDetail,
+    deleteResource,
+    setStatus as apiSetStatus,
+    getUser,
+    normalizeRegistry,
+} from '../utils/apiClient';
 
 const STATUS_CYCLE = ['Pending', 'Execute'];
 
@@ -13,76 +22,38 @@ export function useRegistry({ addLog, onRegistryChange } = {}) {
     const syncMode = useCallback(async (newMode) => {
         setMode(newMode);
         try {
-            await fetchJson(`/api/mode?set=${newMode}`);
-        } catch (err) {
+            await apiSetMode(newMode);
+        } catch {
             addLog?.('error', `Failed to sync mode ${newMode}`);
         }
     }, [addLog]);
 
     const fetchRegistry = useCallback(async () => {
         try {
-            const data = await fetchJson('/api/registry');
-            const list = Array.isArray(data) ? data : [];
-            const filtered = list.filter(item => item.type === 'keep');
-            setRegistry(filtered);
-            onRegistryChange?.(filtered);
+            const normalized = await apiGetRegistry();
+            setRegistry(normalized);
+            onRegistryChange?.(normalized);
             addLog?.('success', 'Manual registry refresh.');
-        } catch (err) {
+        } catch {
             addLog?.('error', 'Failed to retrieve registry.');
         }
     }, [addLog, onRegistryChange]);
 
-    const fetchDetail = useCallback(async (item) => {
-        if (!item || !item.id) {
-            throw new Error('Missing item identifier.');
-        }
-        let url = '';
-        switch (item.type) {
-            case 'keep':
-                url = `/api/notes/detail?id=${encodeURIComponent(item.id)}`;
-                break;
-            case 'doc':
-                url = `/api/docs?id=${encodeURIComponent(item.id)}`;
-                break;
-            case 'sheet':
-                url = `/api/sheets?id=${encodeURIComponent(item.id)}`;
-                break;
-            default:
-                throw new Error(`Unknown item type: ${item.type}`);
-        }
-        return fetchJson(url);
-    }, []);
+    const fetchDetail = useCallback(async (item) => apiGetDetail(item), []);
 
     const deleteItem = useCallback(async (item) => {
-        if (!item || !item.id) return;
-        let url = '';
-        switch (item.type) {
-            case 'keep':
-                url = `/api/notes/delete?id=${encodeURIComponent(item.id)}`;
-                break;
-            case 'doc':
-                url = `/api/docs/delete?id=${encodeURIComponent(item.id)}`;
-                break;
-            case 'sheet':
-                url = `/api/sheets/delete?id=${encodeURIComponent(item.id)}`;
-                break;
-            default:
-                addLog?.('error', `Unknown item type for deletion: ${item.type}`);
-                return;
-        }
         try {
-            const res = await fetch(url, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Purge request failed');
-            addLog?.('success', `Object purged (${item.type}): ${item.id}`);
-        } catch (err) {
-            addLog?.('error', `Purge failed for ${item.type}: ${item.id}`);
+            await deleteResource(item);
+            addLog?.('success', `Object purged (${item?.type || 'item'}): ${item?.id || 'unknown'}`);
+        } catch {
+            addLog?.('error', `Purge failed for ${item?.type || 'item'}: ${item?.id || 'unknown'}`);
         }
     }, [addLog]);
 
     const updateStatus = useCallback(async (item, status) => {
         if (!item || !item.id) return;
         try {
-            await fetch(`/api/status?id=${encodeURIComponent(item.id)}&status=${status}`, { method: 'POST' });
+            await apiSetStatus(item, status);
         } catch (err) {
             addLog?.('error', 'Failed to save status');
             throw err;
@@ -101,19 +72,19 @@ export function useRegistry({ addLog, onRegistryChange } = {}) {
     useEffect(() => {
         const init = async () => {
             try {
-                const userData = await fetchJson('/api/user');
+                const userData = await getUser();
                 setUser(userData);
-            } catch (e) {
+            } catch {
                 /* swallow init user errors */
             }
 
             try {
-                const modeData = await fetchJson('/api/mode');
+                const modeData = await getMode();
                 if (modeData?.mode) {
                     setMode(modeData.mode);
                     addLog?.('system', `State asserted: ${modeData.mode}`);
                 }
-            } catch (e) {
+            } catch {
                 /* swallow init mode errors */
             }
         };
@@ -126,10 +97,9 @@ export function useRegistry({ addLog, onRegistryChange } = {}) {
         es.onmessage = (e) => {
             try {
                 const data = JSON.parse(e.data);
-                const list = Array.isArray(data) ? data : [];
-                const filtered = list.filter(item => item.type === 'keep');
-                setRegistry(filtered);
-                onRegistryChange?.(filtered);
+                const normalized = normalizeRegistry(data);
+                setRegistry(normalized);
+                onRegistryChange?.(normalized);
                 setSecondsRemaining(60);
             } catch (err) { console.error('Stream parse error', err); }
         };

@@ -104,8 +104,10 @@ const App = () => {
 
     const handleDelete = useCallback(() => {
         const target = registry[selectedIndex];
-        if (target) deleteItem(target);
-    }, [registry, selectedIndex, deleteItem]);
+        if (!target) return;
+        deleteItem(target);
+        if (showDetail) closeDetail();
+    }, [registry, selectedIndex, deleteItem, showDetail, closeDetail]);
 
     const handleCycleStatus = useCallback((direction) => {
         if (registry.length === 0) return;

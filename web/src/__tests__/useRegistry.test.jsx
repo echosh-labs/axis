@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach, beforeAll } from 'vitest';
 import { useRegistry } from '../hooks/useRegistry.js';
 
