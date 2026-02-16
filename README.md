@@ -1,88 +1,59 @@
 # axis-mundi
 
-Unified command-center for Google Workspace automation and strategic triage.
+A high-performance command-center and connectivity bridge between Google Gemini voice interfaces and Google Workspace orchestration. Axis Mundi serves as the ingestion and triage layer for voice-generated data.
+
+## Core Connectivity
+
+* **Gemini Voice Bridge**: Acts as a functional uplink between personal mobile devices (via Google Gemini) and professional Workspace accounts.
+
+* **Voice-to-Keep Ingestion**: Captures spoken directives through personal Gemini interfaces, automatically generating Google Keep notes for system ingestion.
+
+* **Orchestration Interface**: Provides a high-speed TUI for the management, inspection, and execution of voice-driven tasks.
 
 ## Features
 
-- **Hybrid TUI**: Keyboard-centric React terminal for browser-based management.
-- **Real-Time Uplink**: Server-Sent Events (SSE) for zero-latency registry updates in `AUTO` mode.
-- **State Persistence**: Server-side state tracking ensures operational mode survival across restarts.
-- **Workspace Integration**: Native Go implementation for Google Workspace APIs.
-- **Service Account Impersonation**: Secure delegation using domain-wide credentials.
+* **Hybrid TUI**: Keyboard-centric React terminal for rapid object management.
 
-### Dual Operation Modes
+* **Real-Time Uplink**: Server-Sent Events (SSE) for zero-latency registry updates.
 
-- **AUTO**: Continuous background retraction and telemetry monitoring via SSE.
-- **MANUAL**: Precise keyboard navigation, inspection, and object purging.
+* **State Persistence**: Server-side tracking of task lifecycles and operational modes.
 
-## Architecture
+* **Service Account Impersonation**: Secure delegation using domain-wide credentials.
 
-- **Backend**: Go (1.24+)
-  - **Entry**: `cmd/axis`
-  - **Logic**: `internal/server` (HTTP/SSE), `internal/workspace` (Google APIs).
-- **Frontend**: React + Vite + Tailwind CSS
-  - **Source**: `web/src`
-  - **Build**: `web/dist` (Served statically by Go).
+## Interaction Schema
+
+### Task Lifecycle Status
+
+* **Pending**: Initial state of ingested voice notes awaiting triage.
+
+* **Execute**: Directive approved for automation or manual processing.
+
+* **Complete**: Task finalized and archived within the Workspace environment.
+
+### Controls
+
+* `[PageUp/PageDown]`: Cycle status (Pending → Execute → Complete).
+
+* `[A]`: Enable AUTO Mode (Background Monitoring).
+
+* `[M]`: Enable MANUAL Mode (Interactive Control).
+
+* `[Arrows]`: Navigate registry list.
+
+* `[Enter/Space]`: Inspect note payload.
+
+* `[Delete]`: Purge note from registry.
 
 ## Setup
 
 ### Prerequisites
 
-- Go 1.24+
-- Node.js 18+ (for frontend build)
-- GCP Service Account with Domain-Wide Delegation (`keep`, `admin.directory.user`).
+* Go 1.24+
 
-### Environment
+* Node.js 18+
 
-Populate `.env` in the root directory:
+* GCP Service Account with Domain-Wide Delegation for Keep, Admin Directory, Docs, Sheets, and Drive.
 
-```env
-ADMIN_EMAIL=admin@example.com
-SERVICE_ACCOUNT_EMAIL=axis-agent@project-id.iam.gserviceaccount.com
-USER_EMAIL=target-user@example.com
-PORT=8080
-```
+## Environment
 
-### Installation
-
-1. **Build Frontend**:
-   ```bash
-   cd web
-   npm install
-   npm run build
-   cd ..
-   ```
-
-2. **Start Backend**:
-   ```bash
-   go mod tidy
-   go run ./cmd/axis
-   ```
-
-3. **Access**: Navigate to [http://localhost:8080](http://localhost:8080).
-
-## Development
-
-For rapid UI development with Hot Module Replacement (HMR):
-
-1. **Start Backend** (Terminal 1):
-   ```bash
-   go run ./cmd/axis
-   ```
-
-2. **Start Frontend Proxy** (Terminal 2):
-   ```bash
-   cd web && npm run dev
-   ```
-
-3. **Access** via [http://localhost:5173](http://localhost:5173).
-
-## Interaction Schema
-
-- `[A]`: Enable AUTO Mode (Background Streaming).
-- `[M]`: Enable MANUAL Mode (Interactive Control).
-- `[R]`: Trigger Manual Registry Refresh.
-- `[Arrows]`: Navigate registry list.
-- `[Enter/Space]`: Inspect raw object data.
-- `[Delete]`: Purge selected object.
-- `[Esc]`: Close detail view.
+Configure `.env` in the root directory with the appropriate administrative and service account credentials:

@@ -43,9 +43,11 @@ describe('useRegistry', () => {
     it('cycles status forward and back', () => {
         const { result } = renderHook(() => useRegistry());
         expect(result.current.nextStatus('Pending', 'forward')).toBe('Execute');
-        expect(result.current.nextStatus('Execute', 'forward')).toBe('Pending');
+        expect(result.current.nextStatus('Execute', 'forward')).toBe('Complete');
+        expect(result.current.nextStatus('Complete', 'forward')).toBe('Pending');
         expect(result.current.nextStatus('Execute', 'back')).toBe('Pending');
-        expect(result.current.nextStatus('Pending', 'back')).toBe('Execute');
+        expect(result.current.nextStatus('Complete', 'back')).toBe('Execute');
+        expect(result.current.nextStatus('Pending', 'back')).toBe('Complete');
     });
 
     it('exposes registry defaults without crashing', () => {

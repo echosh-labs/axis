@@ -217,6 +217,8 @@ const App = () => {
                 return 'border-yellow-700/60 text-yellow-300';
             case 'Execute':
                 return 'border-purple-700/60 text-purple-300';
+            case 'Complete':
+                return 'border-emerald-700/60 text-emerald-300';
             case 'doc': return 'border-blue-700/60 text-blue-300';
             case 'sheet': return 'border-green-700/60 text-green-300';
             default: return 'border-gray-700/60 text-gray-300';

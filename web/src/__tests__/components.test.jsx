@@ -6,6 +6,7 @@ import DetailPanel from '../components/DetailPanel.jsx';
 const sampleRegistry = [
     { id: '1', title: 'First', type: 'keep', status: 'Pending', snippet: 'alpha' },
     { id: '2', title: 'Second', type: 'keep', status: 'Execute', snippet: 'beta' },
+    { id: '3', title: 'Third', type: 'keep', status: 'Complete', snippet: 'gamma' },
 ];
 
 describe('Components rendering', () => {
@@ -21,6 +22,7 @@ describe('Components rendering', () => {
         );
         expect(screen.getByText('Second')).toBeInTheDocument();
         expect(screen.getByText('First')).toBeInTheDocument();
+        expect(screen.getByText('Third')).toBeInTheDocument();
     });
 
     it('renders detail panel for keep item', () => {

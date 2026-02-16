@@ -10,7 +10,7 @@ import {
     normalizeRegistry,
 } from '../utils/apiClient';
 
-const STATUS_CYCLE = ['Pending', 'Execute'];
+const STATUS_CYCLE = ['Pending', 'Execute', 'Complete'];
 
 export function useRegistry({ addLog, onRegistryChange } = {}) {
     const [mode, setMode] = useState('MANUAL');
@@ -117,7 +117,11 @@ export function useRegistry({ addLog, onRegistryChange } = {}) {
             try {
                 const data = JSON.parse(e.data);
                 if (data.status && data.title) {
-                    const logType = data.status === 'Execute' ? 'execute' : 'warning';
+                    const logType = data.status === 'Execute'
+                        ? 'execute'
+                        : data.status === 'Complete'
+                            ? 'success'
+                            : 'warning';
                     addLog?.(logType, `Status → ${data.status}: ${data.title}`);
                 }
             } catch (err) { console.error('Status event parse error', err); }

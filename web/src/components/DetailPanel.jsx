@@ -14,7 +14,7 @@ const DetailPanel = ({
             <div className="flex flex-col">
                 <span className="text-blue-400">Detail: {title}</span>
                 {isKeep && (
-                    <span className={`text-[9px] mt-1 ${status === 'Execute' ? 'text-purple-300' : 'text-yellow-300'}`}>
+                    <span className={`text-[9px] mt-1 ${status === 'Execute' ? 'text-purple-300' : status === 'Complete' ? 'text-emerald-300' : 'text-yellow-300'}`}>
                         Status: {status || 'Pending'}
                     </span>
                 )}
