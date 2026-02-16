@@ -28,6 +28,12 @@ const (
 	autoRefreshTicks = 60
 )
 
+var allowedStatuses = map[string]bool{
+	"Pending":  true,
+	"Execute":  true,
+	"Complete": true,
+}
+
 // RegistryCache stores the latest registry snapshot with a TTL.
 type RegistryCache struct {
 	items     []workspace.RegistryItem
@@ -117,14 +123,13 @@ func (s *Server) loadState() {
 		// Migrate old state values to new ones
 		s.statuses = make(map[string]string, len(ps.Statuses))
 		for id, status := range ps.Statuses {
-			switch status {
-			case "Keep", "Delete":
-				s.statuses[id] = "Pending"
-			case "Execute":
-				s.statuses[id] = "Execute"
-			default:
-				s.statuses[id] = status
+			if status == "Keep" || status == "Delete" {
+				status = "Pending"
 			}
+			if _, ok := allowedStatuses[status]; !ok {
+				status = "Pending"
+			}
+			s.statuses[id] = status
 		}
 	}
 	s.logger.Info("state restored", "duration", time.Since(start), "items", len(s.statuses))
@@ -145,6 +150,7 @@ func (s *Server) Start(port string) error {
 	mux.HandleFunc("/api/docs", s.handleGetDoc)
 	mux.HandleFunc("/api/docs/delete", s.handleDeleteDoc)
 	mux.HandleFunc("/api/registry", s.handleRegistry)
+	mux.HandleFunc("/api/registry/content", s.handleGetRegistryContent)
 	mux.HandleFunc("/api/status", s.handleStatus)
 
 	// SSE Endpoint
@@ -447,6 +453,14 @@ func (s *Server) ensureStatusDefault(id, defaultStatus string) (string, bool) {
 	return defaultStatus, true
 }
 
+func (s *Server) statusForKeep(id string) string {
+	status, created := s.ensureStatusDefault(id, "Pending")
+	if created {
+		s.triggerStateSnapshot()
+	}
+	return status
+}
+
 func (s *Server) ensureKeepNoteCached(id, title string) bool {
 	if id == "" {
 		return false
@@ -520,7 +534,7 @@ func (s *Server) handleNoteDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	note, err := s.ws.GetNote(context.Background(), id)
+	note, err := s.ws.GetNote(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -621,12 +635,61 @@ func (s *Server) handleRegistry(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) handleGetRegistryContent(w http.ResponseWriter, r *http.Request) {
+	id := strings.TrimSpace(r.URL.Query().Get("id"))
+	if id == "" {
+		http.Error(w, "missing id", http.StatusBadRequest)
+		return
+	}
+
+	note, err := s.ws.GetNote(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if note == nil {
+		http.Error(w, "note not found", http.StatusNotFound)
+		return
+	}
+
+	noteID := note.Name
+	if noteID == "" {
+		noteID = id
+	}
+
+	added := s.ensureKeepNoteCached(noteID, note.Title)
+	if added {
+		s.broadcastRegistry()
+	}
+
+	content := strings.TrimSpace(workspace.ExtractFullContent(note.Body))
+	if content == "" {
+		content = "No body content."
+	}
+
+	resp := map[string]string{
+		"id":      noteID,
+		"content": content,
+		"status":  s.statusForKeep(noteID),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func (s *Server) handleStatus(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	status := r.URL.Query().Get("status")
 
 	if id == "" || status == "" {
 		http.Error(w, "missing id or status", http.StatusBadRequest)
+		return
+	}
+
+	if _, ok := allowedStatuses[status]; !ok {
+		http.Error(w, "invalid status", http.StatusBadRequest)
 		return
 	}
 

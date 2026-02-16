@@ -349,6 +349,68 @@ func truncateSnippet(src string) string {
 	return src[:noteSnippetLimit-3] + "..."
 }
 
+// ExtractFullContent flattens a Keep section into markdown-friendly text for downstream agents.
+func ExtractFullContent(section *keepapi.Section) string {
+	if section == nil {
+		return ""
+	}
+
+	if section.Text != nil {
+		text := strings.TrimSpace(section.Text.Text)
+		if text != "" {
+			return text
+		}
+	}
+
+	if section.List != nil && len(section.List.ListItems) > 0 {
+		var b strings.Builder
+		appendListContent(&b, section.List.ListItems, 0)
+		return strings.TrimSpace(b.String())
+	}
+
+	return ""
+}
+
+func appendListContent(b *strings.Builder, items []*keepapi.ListItem, depth int) {
+	if len(items) == 0 {
+		return
+	}
+
+	for _, item := range items {
+		if item == nil {
+			continue
+		}
+
+		label := strings.TrimSpace(listItemText(item))
+		if label == "" {
+			label = "[Empty]"
+		}
+
+		checkbox := "[ ]"
+		if item.Checked {
+			checkbox = "[x]"
+		}
+
+		b.WriteString(strings.Repeat("  ", depth))
+		b.WriteString("- ")
+		b.WriteString(checkbox)
+		b.WriteString(" ")
+		b.WriteString(label)
+		b.WriteString("\n")
+
+		if len(item.ChildListItems) > 0 {
+			appendListContent(b, item.ChildListItems, depth+1)
+		}
+	}
+}
+
+func listItemText(item *keepapi.ListItem) string {
+	if item == nil || item.Text == nil {
+		return ""
+	}
+	return item.Text.Text
+}
+
 func buildListItems(inputs []ListItemInput) []*keepapi.ListItem {
 	if len(inputs) == 0 {
 		return nil
