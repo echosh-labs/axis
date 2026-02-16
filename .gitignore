@@ -33,6 +33,5 @@ node_modules/
 
 # Project specific
 web/dist/
-axis
 test.sh
 axis.state.json
