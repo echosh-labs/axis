@@ -3,27 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECHOSH LABS | AI Agent Architecture</title>
+    <title>axis-mundi | Voice-to-Task AI Orchestration</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #050505; color: #00ff41; font-family: 'Courier New', Courier, monospace; }
         .glow { text-shadow: 0 0 10px #00ff41; }
         .border-system { border: 1px solid #00ff41; }
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .shimmer-text {
+            background-size: 200% auto;
+            animation: shimmer 4s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="p-6 md:p-12">
     <header class="mb-12 border-b border-gray-800 pb-6">
-        <h1 class="text-3xl font-bold glow uppercase tracking-tighter">echosh-labs.com</h1>
-        <p class="text-sm opacity-70">System Status: <span class="text-blue-400">OPERATIONAL</span> | Node: Lincoln_ON</p>
+        <h1 class="text-lg font-bold tracking-[0.6em] lowercase bg-gradient-to-r from-violet-900 via-purple-700 to-emerald-700 text-transparent bg-clip-text shimmer-text drop-shadow-[0_0_8px_rgba(76,29,149,0.45)]">axis mundi</h1>
+        <p class="text-sm opacity-70">System Status: <span class="text-blue-400">OPERATIONAL</span> | Node: Lincoln_ON | <a href="https://echosh-labs.com" class="hover:text-white transition-colors">echoSH labs</a></p>
     </header>
 
     <main class="max-w-4xl">
         <section class="mb-16">
-            <h2 class="text-xl mb-4 text-white uppercase font-bold">[ identity ]</h2>
-            <p class="text-2xl leading-relaxed">
-                I am an <span class="text-white">AI Agent Architect</span>. 
-                I build autonomous systems that bridge the gap between high-level strategy and low-level execution. 
+            <h2 class="text-xl mb-4 text-white uppercase font-bold">[ axis mundi ]</h2>
+            <p class="text-2xl leading-relaxed mb-6">
+                A sophisticated open-source software repository designed to bridge the gap between Google Gemini's voice interface and Google Workspace.
             </p>
+            <p class="text-lg leading-relaxed opacity-90">
+                By utilizing a high-performance Terminal User Interface (TUI), the system allows users to convert spoken thoughts into organized Google Keep notes and actionable tasks. The engine emphasizes intelligent automation, enabling the seamless coordination of complex workflows through both manual oversight and autonomous monitoring.
+            </p>
+        </section>
+
+        <section class="mb-16">
+            <h3 class="text-lg mb-4 text-white uppercase font-bold">[ core features ]</h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="border-system p-6">
+                    <h4 class="text-white mb-2 font-bold">Voice-to-Task Conversion</h4>
+                    <p class="text-sm opacity-80">Transform spoken thoughts into organized Google Keep notes and actionable tasks using Google Gemini's voice interface.</p>
+                </div>
+                <div class="border-system p-6">
+                    <h4 class="text-white mb-2 font-bold">Terminal User Interface</h4>
+                    <p class="text-sm opacity-80">High-performance TUI for efficient workflow management and system orchestration.</p>
+                </div>
+                <div class="border-system p-6">
+                    <h4 class="text-white mb-2 font-bold">Intelligent Automation</h4>
+                    <p class="text-sm opacity-80">Seamless coordination of complex workflows with manual oversight and autonomous monitoring capabilities.</p>
+                </div>
+                <div class="border-system p-6">
+                    <h4 class="text-white mb-2 font-bold">Real-time Synchronization</h4>
+                    <p class="text-sm opacity-80">Server-Sent Events enable instantaneous data synchronization between backend and frontend.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <h3 class="text-lg mb-4 text-white uppercase font-bold">[ technical architecture ]</h3>
+            <div class="border-system p-6">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-white mb-2 font-bold">Backend</h4>
+                        <ul class="text-sm space-y-1 opacity-80">
+                            <li>> Go-powered engine</li>
+                            <li>> Google Workspace integration</li>
+                            <li>> Server-Sent Events for real-time updates</li>
+                            <li>> RESTful API architecture</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-white mb-2 font-bold">Frontend</h4>
+                        <ul class="text-sm space-y-1 opacity-80">
+                            <li>> React-based user interface</li>
+                            <li>> Terminal-inspired design</li>
+                            <li>> Responsive web application</li>
+                            <li>> Modern JavaScript ecosystem</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <h3 class="text-lg mb-4 text-white uppercase font-bold">[ project vision ]</h3>
+            <div class="border-system p-6">
+                <p class="text-base leading-relaxed opacity-90">
+                    Ultimately, this tool aims to liberate the user from digital minutiae by providing a centralized command center for personal productivity and system orchestration. Experience the future of AI-assisted workflow management.
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <h3 class="text-lg mb-4 text-white uppercase font-bold">[ preview ]</h3>
+            <div class="border-system p-6">
+                <img src="screenshot.png" alt="Axis Mundi Interface Preview" class="w-full max-w-2xl mx-auto border border-gray-700">
+                <p class="text-sm opacity-70 mt-4 text-center">Terminal User Interface showcasing voice-to-task conversion and workflow orchestration</p>
+            </div>
         </section>
 
         <section class="grid md:grid-cols-2 gap-8 mb-16">
@@ -35,13 +111,13 @@
                 </div>
             </div>
             <div class="border-system p-6">
-                <h3 class="text-white mb-2 font-bold uppercase">Specialization</h3>
-                <ul class="text-sm space-y-1 opacity-80">
-                    <li>> Multi-agent Orchestration</li>
-                    <li>> Automated Financial Systems</li>
-                    <li>> GCP Infrastructure as Code</li>
-                    <li>> Agentic Workflow Design</li>
-                </ul>
+                <h3 class="text-white mb-2 font-bold uppercase">Integrated Business Verticals</h3>
+                <div id="verticals-list" class="text-sm space-y-1 opacity-80">
+                    <!-- Verticals will be populated by JavaScript -->
+                </div>
+                <div class="text-xs opacity-60 mt-2 text-center">
+                    Cycling through 8 integrated business ideas...
+                </div>
             </div>
         </section>
 
@@ -58,5 +134,36 @@
     <footer class="mt-24 text-[10px] opacity-40">
         &copy; 2026 ECHOSH LABS. AUTHENTIC FREEDOM THROUGH AUTOMATION.
     </footer>
+
+    <script>
+        const verticals = [
+            "Snipers-Box Auction: Voice-to-Keep bidding automation using headless browsers for last-second auction execution.",
+            "Automated Trading System: Voice-parameterized entry/exit logic for executing trades via financial APIs.",
+            "Coding Agent Funnel: Markdown-formatted instruction pipeline for local LLM-based repository modification.",
+            "Automated Media Generator/Player: Voice-prompted media creation and playback using local processing tools like FFmpeg.",
+            "Smart Greenhouse/Hydroponic Controller: Environmental management through host-side GPIO control for nutrient and light cycles.",
+            "Physical Security Hardening: Dynamic local firewall and SSH port management triggered by remote voice commands.",
+            "Laboratory Automation: Multi-step experimental coordination involving timing and temperature sensors on the host machine.",
+            "Puppetry/Robotic Performance Control: Creative performance cue translation into local DMX or servo motor sequences for live theater."
+        ];
+
+        let currentIndex = 0;
+        const verticalsList = document.getElementById('verticals-list');
+
+        function updateVerticals() {
+            verticalsList.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const index = (currentIndex + i) % verticals.length;
+                const li = document.createElement('li');
+                li.textContent = '> ' + verticals[index];
+                verticalsList.appendChild(li);
+            }
+            currentIndex = (currentIndex + 1) % verticals.length;
+        }
+
+        // Initialize and start cycling
+        updateVerticals();
+        setInterval(updateVerticals, 3000); // Cycle every 3 seconds
+    </script>
 </body>
 </html>
