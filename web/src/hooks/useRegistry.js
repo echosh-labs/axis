@@ -8,6 +8,7 @@ import {
     setStatus as apiSetStatus,
     getUser,
     normalizeRegistry,
+    dispatchAutomation as apiDispatchAutomation,
 } from '../utils/apiClient';
 
 const STATUS_CYCLE = ['Pending', 'Execute', 'Active', 'Blocked', 'Review', 'Complete', 'Error'];
@@ -56,6 +57,22 @@ export function useRegistry({ addLog, onRegistryChange } = {}) {
             await apiSetStatus(item, status);
         } catch (err) {
             addLog?.('error', 'Failed to save status');
+            throw err;
+        }
+    }, [addLog]);
+
+    const dispatchAutomationTask = useCallback(async (task) => {
+        const trimmed = task?.trim();
+        if (!trimmed) {
+            const err = new Error('Task required');
+            addLog?.('error', 'Automation task missing');
+            throw err;
+        }
+        try {
+            await apiDispatchAutomation(trimmed);
+            addLog?.('success', `Automation dispatched: ${trimmed}`);
+        } catch (err) {
+            addLog?.('error', `Automation dispatch failed: ${trimmed}`);
             throw err;
         }
     }, [addLog]);
@@ -123,6 +140,17 @@ export function useRegistry({ addLog, onRegistryChange } = {}) {
             } catch (err) { console.error('Status event parse error', err); }
         });
 
+        es.addEventListener('automation', (e) => {
+            try {
+                const data = JSON.parse(e.data);
+                if (!data.task) return;
+                const tone = data.state === 'error' ? 'error' : 'system';
+                const stateLabel = data.state ? data.state.toUpperCase() : 'UPDATE';
+                const suffix = data.error ? ` (${data.error})` : '';
+                addLog?.(tone, `Automation ${stateLabel}: ${data.task}${suffix}`);
+            } catch (err) { console.error('Automation event parse error', err); }
+        });
+
         es.onerror = () => setConnected(false);
         return () => { es.close(); setConnected(false); };
     }, [addLog, onRegistryChange]);
@@ -140,5 +168,6 @@ export function useRegistry({ addLog, onRegistryChange } = {}) {
         deleteItem,
         updateStatus,
         nextStatus,
+        dispatchAutomationTask,
     };
 }

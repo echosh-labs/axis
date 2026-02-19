@@ -16,6 +16,8 @@ const App = () => {
     const [detailItem, setDetailItem] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
     const [detailError, setDetailError] = useState(null);
+    const [automationTask, setAutomationTask] = useState('');
+    const [automationBusy, setAutomationBusy] = useState(false);
     const scrollRef = useRef(null);
     const registryRef = useRef(null);
     const detailRef = useRef(null);
@@ -44,6 +46,7 @@ const App = () => {
         deleteItem,
         updateStatus,
         nextStatus,
+        dispatchAutomationTask,
     } = useRegistry({ addLog, onRegistryChange: handleRegistryChange });
 
     useEffect(() => {
@@ -135,6 +138,21 @@ const App = () => {
             return (prev - 1 + registry.length) % registry.length;
         });
     }, [registry.length]);
+
+    const handleAutomationSubmit = useCallback(async () => {
+        if (automationBusy || mode !== 'MANUAL') return;
+        const task = automationTask.trim();
+        if (!task) return;
+        setAutomationBusy(true);
+        try {
+            await dispatchAutomationTask(task);
+            setAutomationTask('');
+        } catch {
+            // Errors already logged via useRegistry hook; keep input for retry.
+        } finally {
+            setAutomationBusy(false);
+        }
+    }, [automationBusy, automationTask, mode, dispatchAutomationTask]);
 
     useHotkeys({
         mode,
@@ -240,6 +258,11 @@ const App = () => {
                 mode={mode}
                 onSyncMode={syncMode}
                 onRefresh={fetchRegistry}
+                automationTask={automationTask}
+                onAutomationChange={setAutomationTask}
+                onAutomationSubmit={handleAutomationSubmit}
+                automationDisabled={mode !== 'MANUAL'}
+                automationBusy={automationBusy}
             />
 
             <div className="flex flex-1 gap-4 overflow-hidden">

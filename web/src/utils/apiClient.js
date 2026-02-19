@@ -86,3 +86,13 @@ export async function setStatus(item, status) {
     if (!item || !item.id) return;
     return fetch(`/api/status?id=${encodeURIComponent(item.id)}&status=${status}`, { method: 'POST' });
 }
+
+export async function dispatchAutomation(task) {
+    return fetchJson('/api/automation/dispatch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task }),
+        timeout: DEFAULT_TIMEOUT,
+        retry: DEFAULT_RETRY,
+    });
+}

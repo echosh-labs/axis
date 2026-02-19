@@ -1,4 +1,26 @@
-const HeaderBar = ({ user, connected, mode, onSyncMode, onRefresh }) => {
+const HeaderBar = ({
+    user,
+    connected,
+    mode,
+    onSyncMode,
+    onRefresh,
+    automationTask,
+    onAutomationChange,
+    onAutomationSubmit,
+    automationDisabled,
+    automationBusy,
+}) => {
+    const handleAutomationSubmit = (event) => {
+        event.preventDefault();
+        onAutomationSubmit?.();
+    };
+
+    const handleAutomationChange = (event) => {
+        onAutomationChange?.(event.target.value);
+    };
+
+    const computedDisabled = automationDisabled || automationBusy;
+
     return (
         <>
             <div className="mb-4 border border-gray-900 bg-black/60 p-3 rounded flex justify-between items-center">
@@ -22,6 +44,35 @@ const HeaderBar = ({ user, connected, mode, onSyncMode, onRefresh }) => {
                     <span className={mode === 'MANUAL' ? "text-blue-500 cursor-pointer" : "text-gray-700 cursor-not-allowed"} onClick={() => mode === 'MANUAL' && onRefresh()}>[R] REFRESH</span>
                 </div>
                 <div className={mode === 'AUTO' ? "text-emerald-400 animate-pulse" : "text-yellow-600"}>STATUS: {mode}</div>
+            </div>
+            <div className="mb-4 border border-gray-900 bg-black/60 p-3 rounded">
+                <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                    <span>Automation Dispatch</span>
+                    <span>{mode === 'MANUAL' ? 'Ready' : 'Disabled'}</span>
+                </div>
+                <form className="flex gap-2" onSubmit={handleAutomationSubmit}>
+                    <input
+                        type="text"
+                        className="flex-1 bg-black/40 border border-gray-800 rounded px-3 py-2 text-[11px] text-gray-200 focus:border-emerald-600 focus:outline-none"
+                        placeholder="Describe the task to delegate"
+                        value={automationTask}
+                        onChange={handleAutomationChange}
+                        disabled={automationDisabled}
+                    />
+                    <button
+                        type="submit"
+                        disabled={computedDisabled || !automationTask?.trim()}
+                        className={`px-4 py-2 text-[10px] tracking-[0.3em] uppercase rounded border transition ${computedDisabled || !automationTask?.trim()
+                            ? 'border-gray-800 text-gray-700 cursor-not-allowed'
+                            : 'border-emerald-600 text-emerald-400 hover:bg-emerald-600/10'
+                        }`}
+                    >
+                        {automationBusy ? 'Dispatching' : 'Send Task'}
+                    </button>
+                </form>
+                {automationDisabled && (
+                    <div className="text-[9px] text-yellow-600 uppercase tracking-wide mt-2">Switch to MANUAL to enable dispatch.</div>
+                )}
             </div>
         </>
     );

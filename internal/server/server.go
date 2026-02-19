@@ -17,6 +17,7 @@ import (
 	"sync"
 	"time"
 
+	"axis/internal/automation"
 	"axis/internal/database"
 	"axis/internal/workspace"
 )
@@ -53,6 +54,8 @@ type SSEMessage struct {
 	Data  []byte
 }
 
+type automationDispatcher func(string) error
+
 // persistentState defines the structure for disk storage.
 type persistentState struct {
 	Mode     string            `json:"mode"`
@@ -67,6 +70,7 @@ type Server struct {
 	mode     string
 	statuses map[string]string
 	modeMu   sync.RWMutex
+	dispatch automationDispatcher
 
 	registryCache RegistryCache
 
@@ -87,6 +91,10 @@ type ModeResponse struct {
 	Mode string `json:"mode"`
 }
 
+type automationRequest struct {
+	Task string `json:"task"`
+}
+
 // NewServer initializes the server with the workspace service and user context.
 func NewServer(ws *workspace.Service, user *workspace.User) *Server {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
@@ -105,6 +113,7 @@ func NewServer(ws *workspace.Service, user *workspace.User) *Server {
 		statuses: make(map[string]string),
 		clients:  make(map[chan SSEMessage]bool),
 		logger:   logger,
+		dispatch: automation.DispatchToCLI,
 	}
 	s.loadState()
 	return s
@@ -200,6 +209,7 @@ func (s *Server) Start(port string) error {
 	mux.HandleFunc("/api/registry", s.handleRegistry)
 	mux.HandleFunc("/api/registry/content", s.handleGetRegistryContent)
 	mux.HandleFunc("/api/status", s.handleStatus)
+	mux.HandleFunc("/api/automation/dispatch", s.handleAutomationTask)
 
 	// SSE Endpoint
 	mux.HandleFunc("/api/events", s.handleEvents)
@@ -358,6 +368,30 @@ func (s *Server) broadcastStatusChange(id, status, title string) {
 	for clientChan := range s.clients {
 		select {
 		case clientChan <- SSEMessage{Event: "status", Data: data}:
+		default:
+		}
+	}
+}
+
+func (s *Server) broadcastAutomationEvent(state, task, errMsg string) {
+	payload := map[string]string{
+		"state": state,
+		"task":  task,
+	}
+	if errMsg != "" {
+		payload["error"] = errMsg
+	}
+	data, err := json.Marshal(payload)
+	if err != nil {
+		s.logger.Error("automation event marshal failed", "error", err)
+		return
+	}
+
+	s.clientsMu.Lock()
+	defer s.clientsMu.Unlock()
+	for clientChan := range s.clients {
+		select {
+		case clientChan <- SSEMessage{Event: "automation", Data: data}:
 		default:
 		}
 	}
@@ -716,6 +750,55 @@ func (s *Server) handleStatus(w http.ResponseWriter, r *http.Request) {
 	s.triggerStateSnapshot()
 	s.broadcastRegistry()
 	w.WriteHeader(http.StatusOK)
+}
+
+func (s *Server) handleAutomationTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if !s.isManualMode() {
+		http.Error(w, "automation dispatch requires MANUAL mode", http.StatusForbidden)
+		return
+	}
+
+	defer r.Body.Close()
+	reader := http.MaxBytesReader(w, r.Body, 8192)
+	defer reader.Close()
+
+	var req automationRequest
+	if err := json.NewDecoder(reader).Decode(&req); err != nil {
+		http.Error(w, "invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	task := strings.TrimSpace(req.Task)
+	if task == "" {
+		http.Error(w, "task is required", http.StatusBadRequest)
+		return
+	}
+
+	if s.dispatch == nil {
+		http.Error(w, "automation dispatcher unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	if err := s.dispatch(task); err != nil {
+		s.logger.Error("automation dispatch failed", "error", err)
+		s.broadcastAutomationEvent("error", task, err.Error())
+		http.Error(w, "automation dispatch failed", http.StatusInternalServerError)
+		return
+	}
+
+	s.broadcastAutomationEvent("started", task, "")
+	s.logger.Info("automation dispatched", "task", task)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusAccepted)
+	if err := json.NewEncoder(w).Encode(map[string]string{"status": "accepted"}); err != nil {
+		s.logger.Error("automation response encode failed", "error", err)
+	}
 }
 
 func (s *Server) handleGetSheet(w http.ResponseWriter, r *http.Request) {
