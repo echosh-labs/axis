@@ -76,7 +76,9 @@ func TestListRegistryItems(t *testing.T) {
 			w.Write([]byte(`{"notes": [{"name": "notes/1", "title": "Test Note", "trashed": false}]}`))
 			return
 		}
-		http.NotFound(w, r)
+		// Drive API requests (Docs, Sheets) return empty to isolate list keep registry item count.
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"files": []}`))
 	}))
 	defer ts.Close()
 
@@ -86,7 +88,12 @@ func TestListRegistryItems(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ws := NewService(nil, keepSvc, nil, nil, nil)
+	driveSvc, err := drive.NewService(ctx, option.WithEndpoint(ts.URL), option.WithoutAuthentication())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ws := NewService(nil, keepSvc, nil, nil, driveSvc)
 	items, err := ws.ListRegistryItems()
 	if err != nil {
 		t.Fatal(err)
