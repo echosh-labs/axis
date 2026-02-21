@@ -465,6 +465,7 @@ func (s *Server) cleanupStaleStatuses(items []workspace.RegistryItem) bool {
 		// If this status is for a keep note that no longer exists, remove it
 		if !keepIDs[id] {
 			delete(s.statuses, id)
+			s.db.DeleteStatus(id)
 			needSnapshot = true
 			s.logger.Info("removed stale status", "id", id)
 		}
