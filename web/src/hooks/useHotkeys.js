@@ -14,6 +14,7 @@ export function useHotkeys(options) {
         onInspect,
         onDelete,
         onCycleStatus,
+        onChangeViewType,
         detailRef,
         detailScrollStep = 50,
     } = options;
@@ -40,6 +41,12 @@ export function useHotkeys(options) {
             if (key === 'h' && onToggleHelp) {
                 onToggleHelp();
                 return;
+            }
+
+            if (onChangeViewType && !showDetail && !showHelp) {
+                if (key === 'k') { onChangeViewType('keep'); return; }
+                if (key === 'd') { onChangeViewType('doc'); return; }
+                if (key === 's') { onChangeViewType('sheet'); return; }
             }
 
             switch (e.key) {
@@ -81,5 +88,5 @@ export function useHotkeys(options) {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [mode, showDetail, showHelp, setShowDetail, onToggleHelp, onSyncMode, onRefresh, onSelectNext, onSelectPrev, onInspect, onDelete, onCycleStatus, detailRef, detailScrollStep]);
+    }, [mode, showDetail, showHelp, setShowDetail, onToggleHelp, onSyncMode, onRefresh, onSelectNext, onSelectPrev, onInspect, onDelete, onCycleStatus, onChangeViewType, detailRef, detailScrollStep]);
 }

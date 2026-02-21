@@ -22,8 +22,7 @@ export const normalizeRegistry = (list) => {
     if (!Array.isArray(list)) return [];
     return list
         .map(normalizeRegistryItem)
-        .filter(Boolean)
-        .filter(item => item.type === 'keep');
+        .filter(Boolean);
 };
 
 export async function getMode() {

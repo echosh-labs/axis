@@ -2,7 +2,10 @@ const DetailPanel = ({
     title,
     status,
     isKeep,
+    isDoc,
+    isSheet,
     detailContent,
+    sheetValues,
     detailItem,
     detailLoading,
     detailError,
@@ -34,6 +37,38 @@ const DetailPanel = ({
                         <div className="text-[9px] uppercase text-emerald-500 mb-1">Body Content</div>
                         <div className="text-[11px] text-emerald-200 whitespace-pre-wrap leading-relaxed select-text">
                             {detailContent || 'No body content.'}
+                        </div>
+                    </div>
+                )}
+                {isDoc && (
+                    <div className="border border-indigo-900/40 bg-black/50 p-2 rounded">
+                        <div className="text-[9px] uppercase text-indigo-400 mb-1">Document Content</div>
+                        <div className="text-[11px] text-indigo-200 whitespace-pre-wrap leading-relaxed select-text">
+                            {detailContent || 'Document is blank or unreadable.'}
+                        </div>
+                    </div>
+                )}
+                {isSheet && (
+                    <div className="border border-emerald-900/40 bg-black/50 p-2 rounded overflow-auto">
+                        <div className="text-[9px] uppercase text-emerald-400 mb-2">Grid Data</div>
+                        <div className="select-text">
+                            {(!sheetValues || sheetValues.length === 0) ? (
+                                <div className="text-[10px] text-emerald-200/50 italic">Spreadsheet is empty or unreadable.</div>
+                            ) : (
+                                <table className="w-full text-left border-collapse border border-emerald-900/40 mt-1">
+                                    <tbody>
+                                        {sheetValues.map((row, rIdx) => (
+                                            <tr key={rIdx} className="border-b border-emerald-900/30">
+                                                {row.map((cell, cIdx) => (
+                                                    <td key={cIdx} className="text-[10px] text-emerald-100 p-1 px-2 border-r border-emerald-900/30 whitespace-nowrap">
+                                                        {cell !== null && cell !== undefined && cell !== '' ? String(cell) : <span className="text-emerald-900/50 italic">null</span>}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </div>
                 )}

@@ -10,6 +10,7 @@ import { useHotkeys } from './hooks/useHotkeys.js';
 
 const App = () => {
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [viewType, setViewType] = useState('keep'); // 'keep', 'doc', 'sheet'
     const [showDetail, setShowDetail] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
     const [logs, setLogs] = useState([
@@ -48,6 +49,10 @@ const App = () => {
         nextStatus,
     } = useRegistry({ addLog, onRegistryChange: handleRegistryChange });
 
+    const visibleRegistry = useMemo(() => {
+        return registry.filter(item => item.type === viewType);
+    }, [registry, viewType]);
+
     useEffect(() => {
         if (!registryRef.current || showDetail) return;
         const listContainer = registryRef.current;
@@ -59,13 +64,13 @@ const App = () => {
             return;
         }
 
-        if (selectedIndex === registry.length - 1) {
+        if (selectedIndex === visibleRegistry.length - 1) {
             listContainer.scrollTop = listContainer.scrollHeight;
             return;
         }
 
         selectedElement.scrollIntoView({ block: 'nearest' });
-    }, [selectedIndex, registry.length, showDetail]);
+    }, [selectedIndex, visibleRegistry.length, showDetail]);
 
     const closeDetail = useCallback(() => {
         setShowDetail(false);
@@ -83,8 +88,8 @@ const App = () => {
     }, [closeDetail]);
 
     const handleInspect = useCallback(async () => {
-        if (registry.length === 0) return;
-        const target = registry[selectedIndex];
+        if (visibleRegistry.length === 0) return;
+        const target = visibleRegistry[selectedIndex];
         if (!target) return;
 
         setShowDetail(true);
@@ -102,18 +107,18 @@ const App = () => {
         } finally {
             setDetailLoading(false);
         }
-    }, [registry, selectedIndex, fetchDetail, addLog]);
+    }, [visibleRegistry, selectedIndex, fetchDetail, addLog]);
 
     const handleDelete = useCallback(() => {
-        const target = registry[selectedIndex];
+        const target = visibleRegistry[selectedIndex];
         if (!target) return;
         deleteItem(target);
         if (showDetail) closeDetail();
-    }, [registry, selectedIndex, deleteItem, showDetail, closeDetail]);
+    }, [visibleRegistry, selectedIndex, deleteItem, showDetail, closeDetail]);
 
     const handleCycleStatus = useCallback((direction) => {
-        if (registry.length === 0) return;
-        const currentItem = registry[selectedIndex];
+        if (visibleRegistry.length === 0) return;
+        const currentItem = visibleRegistry[selectedIndex];
         if (!currentItem || currentItem.type !== 'keep') return;
 
         const newStatus = nextStatus(currentItem.status || 'Pending', direction === 'forward' ? 'forward' : 'back');
@@ -122,21 +127,27 @@ const App = () => {
         updateStatus(currentItem, newStatus).catch(() => {
             setRegistry(prev => prev.map(item => item.id === currentItem.id ? { ...item, status: currentItem.status || 'Pending' } : item));
         });
-    }, [registry, selectedIndex, nextStatus, setRegistry, updateStatus]);
+    }, [visibleRegistry, selectedIndex, nextStatus, setRegistry, updateStatus]);
 
     const handleSelectNext = useCallback(() => {
         setSelectedIndex((prev) => {
-            if (registry.length === 0) return 0;
-            return (prev + 1) % registry.length;
+            if (visibleRegistry.length === 0) return 0;
+            return (prev + 1) % visibleRegistry.length;
         });
-    }, [registry.length]);
+    }, [visibleRegistry.length]);
 
     const handleSelectPrev = useCallback(() => {
         setSelectedIndex((prev) => {
-            if (registry.length === 0) return 0;
-            return (prev - 1 + registry.length) % registry.length;
+            if (visibleRegistry.length === 0) return 0;
+            return (prev - 1 + visibleRegistry.length) % visibleRegistry.length;
         });
-    }, [registry.length]);
+    }, [visibleRegistry.length]);
+
+    const handleChangeViewType = useCallback((type) => {
+        setViewType(type);
+        setSelectedIndex(0);
+        setShowDetail(false);
+    }, []);
 
     useHotkeys({
         mode,
@@ -151,6 +162,7 @@ const App = () => {
         onInspect: handleInspect,
         onDelete: handleDelete,
         onCycleStatus: handleCycleStatus,
+        onChangeViewType: handleChangeViewType,
         detailRef,
         detailScrollStep: 50,
     });
@@ -205,15 +217,6 @@ const App = () => {
         };
     }, []);
 
-    const detailContent = useMemo(() => {
-        if (!detailItem) return '';
-        const selectedItem = registry[selectedIndex];
-        if (selectedItem && selectedItem.type === 'keep') {
-            return formatNoteContent.fromNote(detailItem);
-        }
-        return 'Detail view not applicable for this item type.';
-    }, [detailItem, formatNoteContent, registry, selectedIndex]);
-
     const getTagStyles = (tag) => {
         switch (tag) {
             case 'Pending':
@@ -257,7 +260,7 @@ const App = () => {
                     </div>
                     {!showDetail ? (
                         <RegistryList
-                            registry={registry}
+                            registry={visibleRegistry}
                             selectedIndex={selectedIndex}
                             mode={mode}
                             registryRef={registryRef}
@@ -265,10 +268,13 @@ const App = () => {
                         />
                     ) : (
                         <DetailPanel
-                            title={registry[selectedIndex]?.title || 'Unknown'}
-                            status={registry[selectedIndex]?.status || 'Pending'}
-                            isKeep={registry[selectedIndex]?.type === 'keep'}
-                            detailContent={detailContent}
+                            title={visibleRegistry[selectedIndex]?.title || 'Unknown'}
+                            status={visibleRegistry[selectedIndex]?.status}
+                            isKeep={visibleRegistry[selectedIndex]?.type === 'keep'}
+                            isDoc={visibleRegistry[selectedIndex]?.type === 'doc'}
+                            isSheet={visibleRegistry[selectedIndex]?.type === 'sheet'}
+                            detailContent={visibleRegistry[selectedIndex]?.type === 'keep' ? formatNoteContent.fromNote(detailItem) : visibleRegistry[selectedIndex]?.type === 'doc' ? detailItem?.content : null}
+                            sheetValues={visibleRegistry[selectedIndex]?.type === 'sheet' ? detailItem?.values : null}
                             detailItem={detailItem}
                             detailLoading={detailLoading}
                             detailError={detailError}
@@ -279,7 +285,7 @@ const App = () => {
                 </div>
             </div>
 
-            <ShortcutsFooter mode={mode} secondsRemaining={secondsRemaining} />
+            <ShortcutsFooter mode={mode} secondsRemaining={secondsRemaining} viewType={viewType} />
         </div>
     );
 };

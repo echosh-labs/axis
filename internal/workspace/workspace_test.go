@@ -76,7 +76,9 @@ func TestListRegistryItems(t *testing.T) {
 			w.Write([]byte(`{"notes": [{"name": "notes/1", "title": "Test Note", "trashed": false}]}`))
 			return
 		}
-		http.NotFound(w, r)
+		// Drive API requests (Docs, Sheets) return empty to isolate list keep registry item count.
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"files": []}`))
 	}))
 	defer ts.Close()
 
@@ -86,7 +88,12 @@ func TestListRegistryItems(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ws := NewService(nil, keepSvc, nil, nil, nil)
+	driveSvc, err := drive.NewService(ctx, option.WithEndpoint(ts.URL), option.WithoutAuthentication())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ws := NewService(nil, keepSvc, nil, nil, driveSvc)
 	items, err := ws.ListRegistryItems()
 	if err != nil {
 		t.Fatal(err)
@@ -97,5 +104,45 @@ func TestListRegistryItems(t *testing.T) {
 	}
 	if items[0].Title != "Test Note" {
 		t.Errorf("expected title 'Test Note', got '%s'", items[0].Title)
+	}
+}
+
+func TestExtractDocContent(t *testing.T) {
+	content := []*docs.StructuralElement{
+		{
+			Paragraph: &docs.Paragraph{
+				Elements: []*docs.ParagraphElement{
+					{
+						TextRun: &docs.TextRun{
+							Content: "Hello ",
+						},
+					},
+					{
+						TextRun: &docs.TextRun{
+							Content: "World\n",
+						},
+					},
+				},
+			},
+		},
+		{
+			Paragraph: &docs.Paragraph{
+				Elements: []*docs.ParagraphElement{
+					{}, // Empty element to test nil text run check
+					{
+						TextRun: &docs.TextRun{
+							Content: "Test content",
+						},
+					},
+				},
+			},
+		},
+		{}, // Empty structural element
+	}
+
+	result := ExtractDocContent(content)
+	expected := "Hello World\nTest content"
+	if result != expected {
+		t.Errorf("expected '%s', got '%s'", expected, result)
 	}
 }
