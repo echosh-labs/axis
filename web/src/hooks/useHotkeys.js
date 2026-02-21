@@ -4,7 +4,9 @@ export function useHotkeys(options) {
     const {
         mode,
         showDetail,
+        showHelp,
         setShowDetail,
+        onToggleHelp,
         onSyncMode,
         onRefresh,
         onSelectNext,
@@ -22,15 +24,21 @@ export function useHotkeys(options) {
 
             if (key === 'a') { onSyncMode('AUTO'); setShowDetail(false); return; }
             if (key === 'm') { onSyncMode('MANUAL'); return; }
-            if (key === 'r') { 
-                if (mode === 'MANUAL') onRefresh(); 
-                return; 
+            if (key === 'r') {
+                if (mode === 'MANUAL') onRefresh();
+                return;
             }
 
             if (mode !== 'MANUAL') return;
 
-            if (showDetail && key === 'escape') {
+            if ((showDetail || showHelp) && key === 'escape') {
                 setShowDetail(false);
+                if (onToggleHelp) onToggleHelp(false);
+                return;
+            }
+
+            if (key === 'h' && onToggleHelp) {
+                onToggleHelp();
                 return;
             }
 
@@ -73,5 +81,5 @@ export function useHotkeys(options) {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [mode, showDetail, setShowDetail, onSyncMode, onRefresh, onSelectNext, onSelectPrev, onInspect, onDelete, onCycleStatus, detailRef, detailScrollStep]);
+    }, [mode, showDetail, showHelp, setShowDetail, onToggleHelp, onSyncMode, onRefresh, onSelectNext, onSelectPrev, onInspect, onDelete, onCycleStatus, detailRef, detailScrollStep]);
 }

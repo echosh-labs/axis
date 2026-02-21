@@ -212,17 +212,15 @@ func (s *Server) Start(port string) error {
 	mux := http.NewServeMux()
 
 	// API Routes
-	mux.HandleFunc("/api/notes", s.handleNotes)
 	mux.HandleFunc("/api/notes/delete", s.handleDelete)
 	mux.HandleFunc("/api/notes/detail", s.handleNoteDetail)
 	mux.HandleFunc("/api/mode", s.handleMode)
 	mux.HandleFunc("/api/user", s.handleUser)
-	mux.HandleFunc("/api/sheets", s.handleGetSheet)
+	mux.HandleFunc("/api/sheets/detail", s.handleGetSheet)
 	mux.HandleFunc("/api/sheets/delete", s.handleDeleteSheet)
-	mux.HandleFunc("/api/docs", s.handleGetDoc)
+	mux.HandleFunc("/api/docs/detail", s.handleGetDoc)
 	mux.HandleFunc("/api/docs/delete", s.handleDeleteDoc)
 	mux.HandleFunc("/api/registry", s.handleRegistry)
-	mux.HandleFunc("/api/registry/content", s.handleGetRegistryContent)
 	mux.HandleFunc("/api/status", s.handleStatus)
 
 	// SSE Endpoint
@@ -551,16 +549,6 @@ func truthyParam(v string) bool {
 	}
 }
 
-func (s *Server) handleNotes(w http.ResponseWriter, r *http.Request) {
-	notes, err := s.ws.ListNotes()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(notes)
-}
-
 func (s *Server) handleNoteDetail(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
@@ -665,50 +653,6 @@ func (s *Server) handleRegistry(w http.ResponseWriter, r *http.Request) {
 	enriched := s.enrichItems(items)
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(enriched); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func (s *Server) handleGetRegistryContent(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimSpace(r.URL.Query().Get("id"))
-	if id == "" {
-		http.Error(w, "missing id", http.StatusBadRequest)
-		return
-	}
-
-	note, err := s.ws.GetNote(r.Context(), id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if note == nil {
-		http.Error(w, "note not found", http.StatusNotFound)
-		return
-	}
-
-	noteID := note.Name
-	if noteID == "" {
-		noteID = id
-	}
-
-	added := s.ensureKeepNoteCached(noteID, note.Title)
-	if added {
-		s.broadcastRegistry()
-	}
-
-	content := strings.TrimSpace(workspace.ExtractFullContent(note.Body))
-	if content == "" {
-		content = "No body content."
-	}
-
-	resp := map[string]string{
-		"id":      noteID,
-		"content": content,
-		"status":  s.statusForKeep(noteID),
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

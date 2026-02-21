@@ -51,10 +51,10 @@ export async function getDetail(item) {
             url = `/api/notes/detail?id=${encodeURIComponent(item.id)}`;
             break;
         case 'doc':
-            url = `/api/docs?id=${encodeURIComponent(item.id)}`;
+            url = `/api/docs/detail?id=${encodeURIComponent(item.id)}`;
             break;
         case 'sheet':
-            url = `/api/sheets?id=${encodeURIComponent(item.id)}`;
+            url = `/api/sheets/detail?id=${encodeURIComponent(item.id)}`;
             break;
         default:
             throw new Error(`Unknown item type: ${item.type}`);

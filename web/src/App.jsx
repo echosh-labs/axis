@@ -4,12 +4,14 @@ import TelemetryPanel from './components/TelemetryPanel.jsx';
 import RegistryList from './components/RegistryList.jsx';
 import DetailPanel from './components/DetailPanel.jsx';
 import ShortcutsFooter from './components/ShortcutsFooter.jsx';
+import HelpOverlay from './components/HelpOverlay.jsx';
 import { useRegistry } from './hooks/useRegistry.js';
 import { useHotkeys } from './hooks/useHotkeys.js';
 
 const App = () => {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [showDetail, setShowDetail] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
     const [logs, setLogs] = useState([
         { timestamp: new Date().toLocaleTimeString(), type: 'system', message: 'Axis TUI Initialized. Mode: MANUAL' }
     ]);
@@ -139,7 +141,9 @@ const App = () => {
     useHotkeys({
         mode,
         showDetail,
+        showHelp,
         setShowDetail: setDetailVisibility,
+        onToggleHelp: (state) => setShowHelp(prev => state !== undefined ? state : !prev),
         onSyncMode: syncMode,
         onRefresh: fetchRegistry,
         onSelectNext: handleSelectNext,
@@ -234,6 +238,7 @@ const App = () => {
 
     return (
         <div className="flex flex-col h-screen p-4 select-text relative outline-none" tabIndex="0">
+            <HelpOverlay isOpen={showHelp} onClose={() => setShowHelp(false)} />
             <HeaderBar
                 user={user}
                 connected={connected}
