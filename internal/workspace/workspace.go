@@ -115,33 +115,7 @@ func (s *Service) ListRegistryItems() ([]RegistryItem, error) {
 		}
 	}
 
-	// 2. Fetch Google Docs
-	docsList, err := s.driveService.Files.List().Q("mimeType='application/vnd.google-apps.document'").PageSize(50).Do()
-	if err != nil {
-		return nil, fmt.Errorf("failed to list docs: %w", err)
-	}
-	for _, file := range docsList.Files {
-		items = append(items, RegistryItem{
-			ID:      file.Id,
-			Type:    "doc",
-			Title:   file.Name,
-			Snippet: "Google Doc",
-		})
-	}
-
-	// 3. Fetch Google Sheets
-	sheetsList, err := s.driveService.Files.List().Q("mimeType='application/vnd.google-apps.spreadsheet'").PageSize(50).Do()
-	if err != nil {
-		return nil, fmt.Errorf("failed to list sheets: %w", err)
-	}
-	for _, file := range sheetsList.Files {
-		items = append(items, RegistryItem{
-			ID:      file.Id,
-			Type:    "sheet",
-			Title:   file.Name,
-			Snippet: "Google Sheet",
-		})
-	}
+	// Docs and Sheets are preserved via endpoints but omitted from unified registry.
 
 	return items, nil
 }

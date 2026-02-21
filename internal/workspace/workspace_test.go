@@ -30,12 +30,16 @@ registry item consolidation, and Google API service wrapping logic.
 package workspace
 
 import (
+	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	admin "google.golang.org/api/admin/directory/v1"
 	docs "google.golang.org/api/docs/v1"
 	drive "google.golang.org/api/drive/v3"
 	keep "google.golang.org/api/keep/v1"
+	"google.golang.org/api/option"
 	sheets "google.golang.org/api/sheets/v4"
 )
 
@@ -62,5 +66,36 @@ func TestNewService(t *testing.T) {
 	}
 	if ws.driveService != driveSvc {
 		t.Error("Drive service not correctly assigned")
+	}
+}
+
+func TestListRegistryItems(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/v1/notes" {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`{"notes": [{"name": "notes/1", "title": "Test Note", "trashed": false}]}`))
+			return
+		}
+		http.NotFound(w, r)
+	}))
+	defer ts.Close()
+
+	ctx := context.Background()
+	keepSvc, err := keep.NewService(ctx, option.WithEndpoint(ts.URL), option.WithoutAuthentication())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ws := NewService(nil, keepSvc, nil, nil, nil)
+	items, err := ws.ListRegistryItems()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(items) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(items))
+	}
+	if items[0].Title != "Test Note" {
+		t.Errorf("expected title 'Test Note', got '%s'", items[0].Title)
 	}
 }

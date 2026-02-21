@@ -2,6 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import RegistryList from '../components/RegistryList.jsx';
 import DetailPanel from '../components/DetailPanel.jsx';
+import HelpOverlay from '../components/HelpOverlay.jsx';
+import HeaderBar from '../components/HeaderBar.jsx';
+import ShortcutsFooter from '../components/ShortcutsFooter.jsx';
 
 const sampleRegistry = [
     { id: '1', title: 'First', type: 'keep', status: 'Pending', snippet: 'alpha' },
@@ -36,10 +39,54 @@ describe('Components rendering', () => {
                 detailLoading={false}
                 detailError={null}
                 detailRef={{ current: null }}
-                onExit={() => {}}
+                onExit={() => { }}
             />
         );
         expect(screen.getByText('Detail: Sample')).toBeInTheDocument();
         expect(screen.getByText('Body text')).toBeInTheDocument();
+    });
+});
+
+describe('Additional Components', () => {
+    it('renders HeaderBar in disconnected state', () => {
+        render(
+            <HeaderBar
+                mode="AUTO"
+                user={{ email: 'test@example.com' }}
+                connected={false}
+            />
+        );
+        expect(screen.getByText(/test@example.com/)).toBeInTheDocument();
+    });
+
+    it('renders ShortcutsFooter next tick in auto mode', () => {
+        render(
+            <ShortcutsFooter
+                mode="AUTO"
+                secondsRemaining={45}
+            />
+        );
+        expect(screen.getByText(/NEXT TICK: 45s/)).toBeInTheDocument();
+    });
+
+    it('renders HelpOverlay when open', () => {
+        render(
+            <HelpOverlay
+                isOpen={true}
+                onClose={() => { }}
+            />
+        );
+        expect(screen.getByText(/TUI Operations/)).toBeInTheDocument();
+        expect(screen.getByText(/API Endpoints/)).toBeInTheDocument();
+    });
+
+    it('does not render HelpOverlay when closed', () => {
+        const { container } = render(
+            <HelpOverlay
+                isOpen={false}
+                onClose={() => { }}
+            />
+        );
+        expect(container).toBeEmptyDOMElement();
     });
 });

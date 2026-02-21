@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach, beforeAll } from 'vitest';
 import { useRegistry } from '../hooks/useRegistry.js';
 
@@ -34,6 +34,7 @@ beforeAll(() => {
 describe('useRegistry', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        global.fetch = vi.fn(async () => ({ ok: true })); // mock raw fetch for updateStatus
     });
 
     afterEach(() => {
@@ -65,5 +66,32 @@ describe('useRegistry', () => {
         const { result } = renderHook(() => useRegistry());
         expect(result.current.registry).toEqual([]);
         expect(result.current.mode).toBeDefined();
+    });
+
+    it('fetches registry manually', async () => {
+        const { result } = renderHook(() => useRegistry());
+        await act(async () => {
+            await result.current.fetchRegistry();
+        });
+        expect(result.current.registry).toEqual([]);
+    });
+
+    it('syncs mode', async () => {
+        const { result } = renderHook(() => useRegistry());
+        await new Promise(r => setTimeout(r, 10)); // wait for init to finish
+        await act(async () => {
+            await result.current.syncMode('AUTO');
+        });
+        expect(result.current.mode).toBe('AUTO');
+    });
+
+    it('handles delete resource silently', async () => {
+        const { result } = renderHook(() => useRegistry());
+        await expect(result.current.deleteItem({ id: 'notes/1', type: 'keep' })).resolves.not.toThrow();
+    });
+
+    it('handles update status silently', async () => {
+        const { result } = renderHook(() => useRegistry());
+        await expect(result.current.updateStatus({ id: 'notes/1', type: 'keep' }, 'Complete')).resolves.not.toThrow();
     });
 });
