@@ -699,8 +699,20 @@ func (s *Server) handleGetSheet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	valuesResp, err := s.ws.GetSheetValues(id, "A1:Z100")
+	var values [][]interface{}
+	if err == nil && valuesResp != nil {
+		values = valuesResp.Values
+	}
+
+	response := map[string]interface{}{
+		"title":         sheet.Properties.Title,
+		"spreadsheetId": sheet.SpreadsheetId,
+		"values":        values,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(sheet); err != nil {
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -739,8 +751,19 @@ func (s *Server) handleGetDoc(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	content := ""
+	if doc.Body != nil {
+		content = workspace.ExtractDocContent(doc.Body.Content)
+	}
+
+	response := map[string]interface{}{
+		"title":      doc.Title,
+		"documentId": doc.DocumentId,
+		"content":    content,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(doc); err != nil {
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

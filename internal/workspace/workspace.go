@@ -120,7 +120,7 @@ func (s *Service) ListRegistryItems() ([]RegistryItem, error) {
 	return items, nil
 }
 
-// GetSheet retrieves a Google Sheet by its ID
+// GetSheet retrieves a Google Sheet and its values by ID
 func (s *Service) GetSheet(spreadsheetId string) (*sheets.Spreadsheet, error) {
 	sheet, err := s.sheetsService.Spreadsheets.Get(spreadsheetId).Do()
 	if err != nil {
@@ -129,17 +129,35 @@ func (s *Service) GetSheet(spreadsheetId string) (*sheets.Spreadsheet, error) {
 	return sheet, nil
 }
 
-// DeleteSheet deletes a Google Sheet by its ID
+// GetSheetValues pulls the explicit tabular grid data from a range
+func (s *Service) GetSheetValues(spreadsheetId string, readRange string) (*sheets.ValueRange, error) {
+	resp, err := s.sheetsService.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
+	if err != nil {
+		return nil, fmt.Errorf("unable to retrieve sheet values %s: %w", spreadsheetId, err)
+	}
+	return resp, nil
+}
+
+// AppendSheetRow pushes an array of values as a new row
+func (s *Service) AppendSheetRow(spreadsheetId string, writeRange string, values []interface{}) error {
+	valueRange := &sheets.ValueRange{
+		Values: [][]interface{}{values},
+	}
+
+	_, err := s.sheetsService.Spreadsheets.Values.Append(spreadsheetId, writeRange, valueRange).
+		ValueInputOption("USER_ENTERED").
+		InsertDataOption("INSERT_ROWS").
+		Do()
+
+	if err != nil {
+		return fmt.Errorf("failed to append row to %s: %w", spreadsheetId, err)
+	}
+	return nil
+}
+
+// DeleteSheet deletes a Google Sheet by its ID using the Drive API
 func (s *Service) DeleteSheet(spreadsheetId string) error {
-	_, err := s.sheetsService.Spreadsheets.BatchUpdate(spreadsheetId, &sheets.BatchUpdateSpreadsheetRequest{
-		Requests: []*sheets.Request{
-			{
-				DeleteSheet: &sheets.DeleteSheetRequest{
-					SheetId: 0,
-				},
-			},
-		},
-	}).Do()
+	err := s.driveService.Files.Delete(spreadsheetId).Do()
 	if err != nil {
 		return fmt.Errorf("unable to delete sheet %s: %w", spreadsheetId, err)
 	}
@@ -155,19 +173,24 @@ func (s *Service) GetDoc(documentId string) (*docs.Document, error) {
 	return doc, nil
 }
 
-// DeleteDoc deletes a Google Doc by its ID
+// ExtractDocContent traverses the rich Google Doc structure and extracts a contiguous plain text string
+func ExtractDocContent(content []*docs.StructuralElement) string {
+	var text string
+	for _, element := range content {
+		if element.Paragraph != nil {
+			for _, element := range element.Paragraph.Elements {
+				if element.TextRun != nil {
+					text += element.TextRun.Content
+				}
+			}
+		}
+	}
+	return text
+}
+
+// DeleteDoc deletes a Google Doc by its ID using the Drive API
 func (s *Service) DeleteDoc(documentId string) error {
-	_, err := s.docsService.Documents.BatchUpdate(documentId, &docs.BatchUpdateDocumentRequest{
-		Requests: []*docs.Request{
-			{
-				DeleteContentRange: &docs.DeleteContentRangeRequest{
-					Range: &docs.Range{
-						StartIndex: 1,
-					},
-				},
-			},
-		},
-	}).Do()
+	err := s.driveService.Files.Delete(documentId).Do()
 	if err != nil {
 		return fmt.Errorf("unable to delete doc %s: %w", documentId, err)
 	}

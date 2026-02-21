@@ -99,3 +99,43 @@ func TestListRegistryItems(t *testing.T) {
 		t.Errorf("expected title 'Test Note', got '%s'", items[0].Title)
 	}
 }
+
+func TestExtractDocContent(t *testing.T) {
+	content := []*docs.StructuralElement{
+		{
+			Paragraph: &docs.Paragraph{
+				Elements: []*docs.ParagraphElement{
+					{
+						TextRun: &docs.TextRun{
+							Content: "Hello ",
+						},
+					},
+					{
+						TextRun: &docs.TextRun{
+							Content: "World\n",
+						},
+					},
+				},
+			},
+		},
+		{
+			Paragraph: &docs.Paragraph{
+				Elements: []*docs.ParagraphElement{
+					{}, // Empty element to test nil text run check
+					{
+						TextRun: &docs.TextRun{
+							Content: "Test content",
+						},
+					},
+				},
+			},
+		},
+		{}, // Empty structural element
+	}
+
+	result := ExtractDocContent(content)
+	expected := "Hello World\nTest content"
+	if result != expected {
+		t.Errorf("expected '%s', got '%s'", expected, result)
+	}
+}
