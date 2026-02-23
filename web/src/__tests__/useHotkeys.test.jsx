@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Justin Andrew Wood. All rights reserved.
+// This software is licensed under the AGPL-3.0.
+// Commercial licensing is available at echosh-labs.com.
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useHotkeys } from '../hooks/useHotkeys.js';

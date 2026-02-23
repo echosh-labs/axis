@@ -1,28 +1,6 @@
-/*
-PROPRIETARY AND CONFIDENTIAL LICENSE
-Copyright © 2026 Justin Andrew Wood. All Rights Reserved.
-
-1. OWNERSHIP
-
-All title, ownership rights, and intellectual property rights in and to this project shall remain the exclusive property of Justin Andrew Wood.
-
-2. RESTRICTIONS
-
-No person or entity may:
-
-• Use, copy, modify, or distribute the Software/Project.
-
-• Sublicense, rent, lease, or lend the Software/Project.
-
-• Reverse engineer, decompile, or disassemble any components.
-
-• Make the project available over a network or public repository.
-
-3. NO GRANT OF LICENSE
-
-This document does not grant any licenses, express or implied, to any party. Any use without the prior written consent of Justin Andrew Wood is strictly prohibited.
-*/
-
+// Copyright (c) 2026 Justin Andrew Wood. All rights reserved.
+// This software is licensed under the AGPL-3.0.
+// Commercial licensing is available at echosh-labs.com.
 /*
 File: cmd/axis/main.go
 Description: Entry point for the Axis application. Initializes Google Workspace services

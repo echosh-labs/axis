@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Justin Andrew Wood. All rights reserved.
+// This software is licensed under the AGPL-3.0.
+// Commercial licensing is available at echosh-labs.com.
 const RegistryList = ({ registry, selectedIndex, mode, registryRef, getTagStyles }) => (
     <div ref={registryRef} className="flex-1 space-y-1 overflow-y-auto scrollbar-hide p-2 pb-2">
         {registry.map((item, i) => {

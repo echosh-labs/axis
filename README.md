@@ -4,6 +4,8 @@ A high-performance command-center and connectivity bridge between Google Gemini 
 
 ## Core Connectivity
 
+This project is dual-licensed. Use of this software is governed by the AGPL-3.0 unless a commercial license has been acquired from echoSH labs.
+
 * **Gemini Voice Bridge**: Acts as a functional uplink between personal mobile devices (via Google Gemini) and professional Workspace accounts.
 
 * **Voice-to-Keep Ingestion**: Captures spoken directives through personal Gemini interfaces, automatically generating Google Keep notes for system ingestion.

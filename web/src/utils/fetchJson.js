@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Justin Andrew Wood. All rights reserved.
+// This software is licensed under the AGPL-3.0.
+// Commercial licensing is available at echosh-labs.com.
 export async function fetchJson(url, options = {}) {
     const { timeout = 8000, retry = 0, retryDelay = 250, ...rest } = options;
 

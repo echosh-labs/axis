@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Justin Andrew Wood. All rights reserved.
+// This software is licensed under the AGPL-3.0.
+// Commercial licensing is available at echosh-labs.com.
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import RegistryList from '../components/RegistryList.jsx';
