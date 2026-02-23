@@ -14,15 +14,16 @@ const HelpOverlay = ({ isOpen, onClose }) => {
                     <section>
                         <h3 className="text-cyan-500 border-b border-cyan-900/50 pb-1 mb-2 uppercase font-semibold">TUI Operations</h3>
                         <div className="grid grid-cols-2 gap-2 font-mono">
-                            <div><span className="text-yellow-400 font-bold">A</span> : Auto Mode</div>
-                            <div><span className="text-yellow-400 font-bold">M</span> : Manual Mode</div>
-                            <div><span className="text-yellow-400 font-bold">R</span> : Refresh (Manual)</div>
-                            <div><span className="text-yellow-400 font-bold">H</span> : Toggle Help</div>
-                            <div><span className="text-yellow-400 font-bold">Enter/Space</span> : Inspect Item</div>
-                            <div><span className="text-yellow-400 font-bold">Arrows</span> : Navigate / Scroll</div>
-                            <div><span className="text-yellow-400 font-bold">Del/Bksp</span> : Delete Item</div>
-                            <div><span className="text-yellow-400 font-bold">PgUp/PgDn</span> : Cycle Status</div>
-                            <div><span className="text-yellow-400 font-bold">K/D/S/V</span> : View Filters</div>
+                            <div><span className="text-yellow-400 font-bold">A</span> : Auto mode (live stream)</div>
+                            <div><span className="text-yellow-400 font-bold">M</span> : Manual mode (enables nav)</div>
+                            <div><span className="text-yellow-400 font-bold">R</span> : Refresh registry (manual only)</div>
+                            <div><span className="text-yellow-400 font-bold">H</span> : Toggle help overlay</div>
+                            <div><span className="text-yellow-400 font-bold">Enter/Space</span> : Inspect highlighted item</div>
+                            <div><span className="text-yellow-400 font-bold">Arrows</span> : Navigate list / scroll detail</div>
+                            <div><span className="text-yellow-400 font-bold">Del/Bksp</span> : Purge selected item</div>
+                            <div><span className="text-yellow-400 font-bold">PgUp/PgDn</span> : Cycle Keep status (fwd/back)</div>
+                            <div><span className="text-yellow-400 font-bold">K/D/S/G/V</span> : Filter Keep/Docs/Sheets/Gmail/All</div>
+                            <div><span className="text-yellow-400 font-bold">Esc</span> : Close detail or help (manual)</div>
                         </div>
                     </section>
 
@@ -32,18 +33,20 @@ const HelpOverlay = ({ isOpen, onClose }) => {
                             <thead>
                                 <tr className="text-gray-500">
                                     <th className="pb-2">Endpoint</th>
-                                    <th className="pb-2 w-16">Method</th>
+                                    <th className="pb-2 w-20">Method</th>
                                     <th className="pb-2">Description</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-green-400">/api/registry</td><td>GET</td><td>Unified registry (Docs, Keep, Sheets)</td></tr>
-                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-cyan-400">/api/&#123;notes|docs|sheets&#125;/detail?id=X</td><td>GET</td><td>Detail for specific item</td></tr>
-                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-red-400">/api/&#123;notes|docs|sheets&#125;/delete?id=X</td><td>DEL</td><td>Delete a specific item</td></tr>
-                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-yellow-400">/api/status?id=X&amp;status=Y</td><td>POST</td><td>Update item status</td></tr>
-                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-purple-400">/api/mode?set=X</td><td>GET/SET</td><td>Toggle Auto/Manual mode</td></tr>
-                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-purple-400">/api/user</td><td>GET</td><td>Current user profile</td></tr>
-                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-blue-400">/api/events</td><td>SSE</td><td>Server-Sent Events stream</td></tr>
+                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-green-400">/api/registry</td><td>GET</td><td>Unified registry stream state</td></tr>
+                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-green-400">/api/registry?refresh=1</td><td>GET</td><td>Manual fetch (R key)</td></tr>
+                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-cyan-400">/api/{'{'}notes|docs|sheets|gmail{'}'}/detail?id=X</td><td>GET</td><td>Detail payload for selected item</td></tr>
+                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-red-400">/api/{'{'}notes|docs|sheets|gmail{'}'}/delete?id=X</td><td>DELETE</td><td>Purge selected item</td></tr>
+                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-yellow-400">/api/status?id=X&amp;status=Y</td><td>POST</td><td>Update Keep status (cycle keys)</td></tr>
+                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-purple-400">/api/mode</td><td>GET</td><td>Current Auto/Manual state</td></tr>
+                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-purple-400">/api/mode?set=X</td><td>GET</td><td>Switch to AUTO or MANUAL</td></tr>
+                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-purple-400">/api/user</td><td>GET</td><td>Active user profile</td></tr>
+                                <tr className="border-t border-gray-800 hover:bg-white/5"><td className="py-1 text-blue-400">/api/events</td><td>SSE</td><td>Live registry + tick/status events</td></tr>
                             </tbody>
                         </table>
                     </section>
