@@ -42,6 +42,7 @@ import (
 	admin "google.golang.org/api/admin/directory/v1"
 	docs "google.golang.org/api/docs/v1"
 	drive "google.golang.org/api/drive/v3"
+	gmail "google.golang.org/api/gmail/v1"
 	"google.golang.org/api/impersonate"
 	keep "google.golang.org/api/keep/v1"
 	"google.golang.org/api/option"
@@ -78,6 +79,7 @@ func main() {
 			docs.DocumentsScope,
 			sheets.SpreadsheetsScope,
 			drive.DriveReadonlyScope,
+			gmail.GmailReadonlyScope,
 		},
 	})
 	if err != nil {
@@ -110,8 +112,13 @@ func main() {
 		log.Fatalf("Failed to create Drive service: %v", err)
 	}
 
+	gmailSvc, err := gmail.NewService(ctx, option.WithTokenSource(ts))
+	if err != nil {
+		log.Fatalf("Failed to create Gmail service: %v", err)
+	}
+
 	// 5. Initialize internal workspace wrapper
-	ws := workspace.NewService(adminSvc, keepSvc, docsSvc, sheetsSvc, driveSvc)
+	ws := workspace.NewService(adminSvc, keepSvc, docsSvc, sheetsSvc, driveSvc, gmailSvc)
 
 	// 6. Verification check
 	user, err := ws.GetUser(userEmail)
