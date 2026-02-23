@@ -3,167 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>axis-mundi | Voice-to-Task AI Orchestration</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #050505; color: #00ff41; font-family: 'Courier New', Courier, monospace; }
-        .glow { text-shadow: 0 0 10px #00ff41; }
-        .border-system { border: 1px solid #00ff41; }
-        @keyframes shimmer {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .shimmer-text {
-            background-size: 200% auto;
-            animation: shimmer 4s ease-in-out infinite;
-        }
-    </style>
+    <title>axis mundi | Voice-to-Task AI Orchestration</title>
+    <meta name="description" content="Axis Mundi is an open-source voice-to-task orchestrator that links Google Gemini voice with Google Workspace via a TUI and automation engine.">
+    <link rel="canonical" href="https://echosh-labs.com/axis-mundi">
+    <meta name="theme-color" content="#0a0c10">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Axis Mundi | Voice-to-Task AI Orchestration">
+    <meta property="og:description" content="Convert voice to Google Workspace actions with a terminal-inspired orchestrator.">
+    <meta property="og:url" content="https://echosh-labs.com/axis-mundi">
+    <meta property="og:image" content="https://echosh-labs.com/axis-mundi/og.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Axis Mundi | Voice-to-Task AI Orchestration">
+    <meta name="twitter:description" content="Convert voice to Google Workspace actions with a terminal-inspired orchestrator.">
+    <meta name="twitter:image" content="https://echosh-labs.com/axis-mundi/og.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./dist/landing.llLpvHyf.css" xintegrity="sha384-llLpvHyflkFUCveZQ+ofiefy46d8fZnUeLdKBGXAeExNVGB8IctfpvdBGEOAdwDa" crossorigin="anonymous">
 </head>
-<body class="p-6 md:p-12">
-    <header class="mb-12 border-b border-gray-800 pb-6">
-        <h1 class="text-lg font-bold tracking-[0.6em] lowercase bg-gradient-to-r from-violet-900 via-purple-700 to-emerald-700 text-transparent bg-clip-text shimmer-text drop-shadow-[0_0_8px_rgba(76,29,149,0.45)]">axis mundi</h1>
-        <p class="text-sm opacity-70">System Status: <span class="text-blue-400">OPERATIONAL</span> | Node: Lincoln_ON | <a href="https://echosh-labs.com" class="hover:text-white transition-colors">echoSH labs</a></p>
-    </header>
-
-    <main class="max-w-4xl">
-        <section class="mb-16">
-            <h2 class="text-xl mb-4 text-white uppercase font-bold">[ axis mundi ]</h2>
-            <p class="text-2xl leading-relaxed mb-6">
-                A sophisticated open-source software repository designed to bridge the gap between Google Gemini's voice interface and Google Workspace.
-            </p>
-            <p class="text-lg leading-relaxed opacity-90">
-                By utilizing a high-performance Terminal User Interface (TUI), the system allows users to convert spoken thoughts into organized Google Keep notes and actionable tasks. The engine emphasizes intelligent automation, enabling the seamless coordination of complex workflows through both manual oversight and autonomous monitoring.
-            </p>
-        </section>
-
-        <section class="mb-16">
-            <h3 class="text-lg mb-4 text-white uppercase font-bold">[ core features ]</h3>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="border-system p-6">
-                    <h4 class="text-white mb-2 font-bold">Voice-to-Task Conversion</h4>
-                    <p class="text-sm opacity-80">Transform spoken thoughts into organized Google Keep notes and actionable tasks using Google Gemini's voice interface.</p>
+<body class="min-h-screen bg-charcoal-900 text-slate-100">
+    <div class="max-w-6xl mx-auto px-6 py-10 md:py-14">
+        <header class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div>
+                <div class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] px-3 py-1 text-xs text-[var(--muted)] mono">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-glow"></span>
+                    <span>Operational · Demo data</span>
+                    <span class="hidden sm:inline">| Node: Lincoln_ON</span>
                 </div>
-                <div class="border-system p-6">
-                    <h4 class="text-white mb-2 font-bold">Terminal User Interface</h4>
-                    <p class="text-sm opacity-80">High-performance TUI for efficient workflow management and system orchestration.</p>
-                </div>
-                <div class="border-system p-6">
-                    <h4 class="text-white mb-2 font-bold">Intelligent Automation</h4>
-                    <p class="text-sm opacity-80">Seamless coordination of complex workflows with manual oversight and autonomous monitoring capabilities.</p>
-                </div>
-                <div class="border-system p-6">
-                    <h4 class="text-white mb-2 font-bold">Real-time Synchronization</h4>
-                    <p class="text-sm opacity-80">Server-Sent Events enable instantaneous data synchronization between backend and frontend.</p>
-                </div>
+                <h1 class="mt-3 text-3xl font-semibold tracking-[0.6em] lowercase shimmer-text drop-shadow-[0_0_8px_rgba(76,29,149,0.45)]">axis mundi</h1>
+                <p class="mt-1 text-sm text-[var(--muted)]">Voice-to-task AI orchestration for Google Workspace</p>
             </div>
-        </section>
+            <div class="flex flex-wrap gap-3 text-xs text-[var(--muted)]">
+                <span class="tag bg-white/5 text-emerald-200">Open Source</span>
+                <span class="tag bg-white/5 text-amber-200">Go · React</span>
+                <span class="tag bg-white/5">TUI Orchestrator</span>
+            </div>
+        </header>
 
-        <section class="mb-16">
-            <h3 class="text-lg mb-4 text-white uppercase font-bold">[ technical architecture ]</h3>
-            <div class="border-system p-6">
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div>
-                        <h4 class="text-white mb-2 font-bold">Backend</h4>
-                        <ul class="text-sm space-y-1 opacity-80">
-                            <li>> Go-powered engine</li>
-                            <li>> Google Workspace integration</li>
-                            <li>> Server-Sent Events for real-time updates</li>
-                            <li>> RESTful API architecture</li>
-                        </ul>
+        <main class="mt-12 space-y-14">
+            <section class="grid gap-10 md:grid-cols-[1.1fr_0.9fr] items-center">
+                <div class="space-y-6">
+                    <p class="text-lg text-slate-200 leading-relaxed">Axis Mundi bridges Google Gemini voice inputs with Google Workspace actions. Orchestrate notes, docs, sheets, and threads with a terminal-inspired interface that balances autonomy with manual control.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <a class="cta-btn bg-[var(--accent)] text-charcoal-900" href="https://github.com/echosh-labs/axis-mundi" target="_blank" rel="noreferrer">
+                            View on GitHub
+                            <span aria-hidden="true">↗</span>
+                        </a>
+                        <a class="cta-btn bg-charcoal-800 text-slate-100 border border-[var(--border)]" href="mailto:justin@echosh-labs.com">
+                            Contact maintainer
+                        </a>
                     </div>
-                    <div>
-                        <h4 class="text-white mb-2 font-bold">Frontend</h4>
-                        <ul class="text-sm space-y-1 opacity-80">
-                            <li>> React-based user interface</li>
-                            <li>> Terminal-inspired design</li>
-                            <li>> Responsive web application</li>
-                            <li>> Modern JavaScript ecosystem</li>
-                        </ul>
+                    <div class="grid grid-cols-2 gap-4 text-sm text-[var(--muted)]">
+                        <div class="panel p-4">
+                            <div class="text-emerald-200 font-semibold mb-1">Live/Manual modes</div>
+                            <p>Switch between AUTO (SSE stream) and MANUAL (on-demand refresh + keyboard nav).</p>
+                        </div>
+                        <div class="panel p-4">
+                            <div class="text-amber-200 font-semibold mb-1">Workspace coverage</div>
+                            <p>Keep, Docs, Sheets, and Gmail all land in one unified registry with detail views.</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <section class="mb-16">
-            <h3 class="text-lg mb-4 text-white uppercase font-bold">[ project vision ]</h3>
-            <div class="border-system p-6">
-                <p class="text-base leading-relaxed opacity-90">
-                    Ultimately, this tool aims to liberate the user from digital minutiae by providing a centralized command center for personal productivity and system orchestration. Experience the future of AI-assisted workflow management.
-                </p>
-            </div>
-        </section>
-
-        <section class="mb-16">
-            <h3 class="text-lg mb-4 text-white uppercase font-bold">[ preview ]</h3>
-            <div class="border-system p-6">
-                <img src="screenshot.png" alt="Axis Mundi Interface Preview" class="w-full max-w-2xl mx-auto border border-gray-700">
-                <p class="text-sm opacity-70 mt-4 text-center">Terminal User Interface showcasing voice-to-task conversion and workflow orchestration</p>
-            </div>
-        </section>
-
-        <section class="grid md:grid-cols-2 gap-8 mb-16">
-            <div class="border-system p-6">
-                <h3 class="text-white mb-2 font-bold uppercase">Current Project: axis-mundi</h3>
-                <p class="text-sm opacity-80 mb-4">An agentic hypervisor built in Go for automated content synthesis and Workspace intelligence.</p>
-                <div class="text-xs">
-                    [ STACK: GO / GCP / REACT / WORKSPACE ]
+                <div class="panel p-5 bg-charcoal-800/60 border border-[var(--border)]">
+                    <div class="flex items-center justify-between text-xs text-[var(--muted)]">
+                        <span class="mono">/screens/overview</span>
+                        <span class="rounded-full bg-emerald-500/15 text-emerald-100 px-3 py-1 text-[11px]">Demo capture</span>
+                    </div>
+                    <div class="mt-3 overflow-hidden rounded-xl border border-[var(--border)] bg-charcoal-700 min-h-[260px] flex items-center justify-center text-[var(--muted)] text-sm">
+                        <div class="text-center px-6 py-10">
+                            <div class="mb-3 text-slate-100 font-semibold">Interface preview placeholder</div>
+                            <p>Replace screenshot.png with a fresh capture of the TUI/web UI. (Currently using placeholder art.)</p>
+                        </div>
+                    </div>
+                    <p class="mt-3 text-[11px] text-[var(--muted)]">Status and node values are demo labels; wire to live API if available.</p>
                 </div>
-            </div>
-            <div class="border-system p-6">
-                <h3 class="text-white mb-2 font-bold uppercase">Integrated Business Verticals</h3>
-                <div id="verticals-list" class="text-sm space-y-1 opacity-80">
-                    <!-- Verticals will be populated by JavaScript -->
-                </div>
-                <div class="text-xs opacity-60 mt-2 text-center">
-                    Cycling through 8 integrated business ideas...
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <section>
-            <h2 class="text-xl mb-4 text-white uppercase font-bold">[ contact ]</h2>
-            <div class="space-x-4">
-                <a href="mailto:justin@echosh-labs.com" class="hover:bg-white hover:text-black p-1 transition-colors border-system">EMAIL</a>
-                <a href="https://github.com/echosh-labs/axis-mundi" class="hover:bg-white hover:text-black p-1 transition-colors border-system">GITHUB</a>
-                <a href="https://www.linkedin.com/in/justinwoodconsulting/" class="hover:bg-white hover:text-black p-1 transition-colors border-system">LINKEDIN</a>
-            </div>
-        </section>
-    </main>
+            <section class="panel p-6 bg-charcoal-800/80 border border-[var(--border)]">
+                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-sm uppercase tracking-[0.12em] text-[var(--muted)]">How it works</h2>
+                        <p class="text-lg text-white mt-1">Three steps from voice to action.</p>
+                    </div>
+                    <div class="flex gap-3 flex-wrap text-xs text-[var(--muted)]">
+                        <span class="tag bg-white/5">Voice → TUI → Workspace</span>
+                        <span class="tag bg-white/5">SSE + REST APIs</span>
+                    </div>
+                </div>
+                <div class="grid gap-4 md:grid-cols-3 mt-6">
+                    <div class="rounded-xl border border-[var(--border)] bg-charcoal-700/60 p-4">
+                        <div class="text-emerald-200 font-semibold mb-2">1 · Capture</div>
+                        <p class="text-sm text-[var(--muted)]">Speak to Gemini; transcripts are normalized into tasks and routed to the registry.</p>
+                    </div>
+                    <div class="rounded-xl border border-[var(--border)] bg-charcoal-700/60 p-4">
+                        <div class="text-amber-200 font-semibold mb-2">2 · Orchestrate</div>
+                        <p class="text-sm text-[var(--muted)]">Use keyboard-first TUI to filter, inspect, and adjust statuses across Keep/Docs/Sheets/Gmail.</p>
+                    </div>
+                    <div class="rounded-xl border border-[var(--border)] bg-charcoal-700/60 p-4">
+                        <div class="text-sky-200 font-semibold mb-2">3 · Execute</div>
+                        <p class="text-sm text-[var(--muted)]">Automation agents perform updates; manual mode keeps a human-in-the-loop when needed.</p>
+                    </div>
+                </div>
+            </section>
 
-    <footer class="mt-24 text-[10px] opacity-40">
-        &copy; 2026 ECHOSH LABS. AUTHENTIC FREEDOM THROUGH AUTOMATION.
-    </footer>
+            <section class="grid gap-6 md:grid-cols-2">
+                <div class="panel p-6 bg-charcoal-800/70 border border-[var(--border)]">
+                    <h2 class="text-lg text-white font-semibold mb-4">Core capabilities</h2>
+                    <ul class="space-y-3 text-sm text-[var(--muted)]">
+                        <li class="flex gap-3"><span class="text-emerald-300 mono">⌘</span><span>Unified registry with keyboard-driven navigation and detail panes.</span></li>
+                        <li class="flex gap-3"><span class="text-emerald-300 mono">⌘</span><span>SSE uplink for live updates; manual refresh for deterministic runs.</span></li>
+                        <li class="flex gap-3"><span class="text-emerald-300 mono">⌘</span><span>Status cycling for Keep tasks with optimistic UI + rollback.</span></li>
+                        <li class="flex gap-3"><span class="text-emerald-300 mono">⌘</span><span>Docs/Sheets/Gmail detail retrieval with graceful error handling.</span></li>
+                    </ul>
+                </div>
+                <div class="panel p-6 bg-charcoal-800/70 border border-[var(--border)]">
+                    <h2 class="text-lg text-white font-semibold mb-4">Technical stack</h2>
+                    <div class="grid grid-cols-2 gap-3 text-sm text-[var(--muted)]">
+                        <div class="rounded-lg bg-charcoal-700/60 border border-[var(--border)] p-3">Go backend · REST + SSE</div>
+                        <div class="rounded-lg bg-charcoal-700/60 border border-[var(--border)] p-3">React frontend · Vite/Tailwind</div>
+                        <div class="rounded-lg bg-charcoal-700/60 border border-[var(--border)] p-3">Workspace APIs (Keep/Docs/Sheets/Gmail)</div>
+                        <div class="rounded-lg bg-charcoal-700/60 border border-[var(--border)] p-3">Agentic pipeline for task execution</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel p-6 bg-charcoal-800/70 border border-[var(--border)]">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-lg text-white font-semibold">Integrated verticals</h2>
+                        <p class="text-sm text-[var(--muted)]">Browse scenarios. Updates occur on button press (no auto-scroll) and announce politely.</p>
+                    </div>
+                    <div class="flex gap-2" aria-label="Vertical controls">
+                        <button id="prev-vertical" class="cta-btn bg-charcoal-800 text-slate-100 border border-[var(--border)]" type="button">Previous</button>
+                        <button id="next-vertical" class="cta-btn bg-[var(--accent)] text-charcoal-900" type="button">Next</button>
+                    </div>
+                </div>
+                <div class="mt-5 grid gap-3 md:grid-cols-2">
+                    <div class="space-y-3">
+                        <div id="verticals-live" class="rounded-xl border border-[var(--border)] bg-charcoal-700/60 p-4 text-sm text-[var(--muted)]" aria-live="polite"></div>
+                        <div class="flex gap-2" id="dots"></div>
+                    </div>
+                    <div class="rounded-xl border border-[var(--border)] bg-charcoal-700/60 p-4 text-sm text-[var(--muted)]">
+                        <p class="text-[11px] uppercase mono text-[var(--muted)] mb-2">Note</p>
+                        <p>These verticals represent demo scenarios. Swap in active pipelines or link to real task runs to keep this page aligned with production.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel p-6 bg-charcoal-800/80 border border-[var(--border)]">
+                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-lg text-white font-semibold">Get involved</h2>
+                        <p class="text-sm text-[var(--muted)]">Star the repo, open an issue, or propose an integration.</p>
+                    </div>
+                    <div class="flex gap-3 flex-wrap">
+                        <a class="cta-btn bg-[var(--accent)] text-charcoal-900" href="https://github.com/echosh-labs/axis-mundi" target="_blank" rel="noreferrer">GitHub</a>
+                        <a class="cta-btn bg-charcoal-800 text-slate-100 border border-[var(--border)]" href="https://www.linkedin.com/in/justinwoodconsulting/" target="_blank" rel="noreferrer">LinkedIn</a>
+                        <a class="cta-btn bg-charcoal-800 text-slate-100 border border-[var(--border)]" href="mailto:justin@echosh-labs.com">Email</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="mt-14 text-[11px] text-[var(--muted)] flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <span>© 2026 echoSH labs · Authentic freedom through automation.</span>
+            <span class="mono">Static build · Replace demo data when live endpoints are available.</span>
+        </footer>
+    </div>
 
     <script>
         const verticals = [
-            "Snipers-Box Auction: Voice-to-Keep bidding automation using headless browsers for last-second auction execution.",
-            "Automated Trading System: Voice-parameterized entry/exit logic for executing trades via financial APIs.",
-            "Coding Agent Funnel: Markdown-formatted instruction pipeline for local LLM-based repository modification.",
-            "Automated Media Generator/Player: Voice-prompted media creation and playback using local processing tools like FFmpeg.",
-            "Smart Greenhouse/Hydroponic Controller: Environmental management through host-side GPIO control for nutrient and light cycles.",
-            "Physical Security Hardening: Dynamic local firewall and SSH port management triggered by remote voice commands.",
-            "Laboratory Automation: Multi-step experimental coordination involving timing and temperature sensors on the host machine.",
-            "Puppetry/Robotic Performance Control: Creative performance cue translation into local DMX or servo motor sequences for live theater."
+            "Voice-primed bidding agent for auctions with last-second execution.",
+            "Voice-parameterized trade executor backed by rules-based risk guards.",
+            "Markdown-coded agent funnel for repository modifications via LLM.",
+            "Voice-prompted media generator/player orchestrated with local tooling.",
+            "Smart greenhouse controller coordinating GPIO for growth cycles.",
+            "Adaptive firewall/SSH posture driven by voice-triggered hardening.",
+            "Multi-step lab automation with timing and temperature sensors.",
+            "Performance cues translated into DMX/servo sequences for stage shows."
         ];
 
-        let currentIndex = 0;
-        const verticalsList = document.getElementById('verticals-list');
+        const liveRegion = document.getElementById('verticals-live');
+        const dots = document.getElementById('dots');
+        const prevBtn = document.getElementById('prev-vertical');
+        const nextBtn = document.getElementById('next-vertical');
+        let index = 0;
 
-        function updateVerticals() {
-            verticalsList.innerHTML = '';
-            for (let i = 0; i < 4; i++) {
-                const index = (currentIndex + i) % verticals.length;
-                const li = document.createElement('li');
-                li.textContent = '> ' + verticals[index];
-                verticalsList.appendChild(li);
-            }
-            currentIndex = (currentIndex + 1) % verticals.length;
+        function renderDots() {
+            dots.innerHTML = '';
+            verticals.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.className = `h-2.5 w-2.5 rounded-full border border-[var(--border)] ${i === index ? 'bg-[var(--accent)]' : 'bg-charcoal-900'}`;
+                dot.setAttribute('aria-label', `Show vertical ${i + 1}`);
+                dot.addEventListener('click', () => { index = i; renderVerticals(); });
+                dots.appendChild(dot);
+            });
         }
 
-        // Initialize and start cycling
-        updateVerticals();
-        setInterval(updateVerticals, 3000); // Cycle every 3 seconds
+        function renderVerticals() {
+            const items = [];
+            for (let i = 0; i < 3; i++) {
+                const idx = (index + i) % verticals.length;
+                items.push(`<li class="mb-2">${idx + 1}. ${verticals[idx]}</li>`);
+            }
+            liveRegion.innerHTML = `<ul class="list-disc list-inside space-y-1">${items.join('')}</ul>`;
+            renderDots();
+        }
+
+        prevBtn.addEventListener('click', () => {
+            index = (index - 1 + verticals.length) % verticals.length;
+            renderVerticals();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            index = (index + 1) % verticals.length;
+            renderVerticals();
+        });
+
+        renderVerticals();
     </script>
 </body>
 </html>
