@@ -19,10 +19,10 @@ import (
 
 	"github.com/joho/godotenv"
 	admin "google.golang.org/api/admin/directory/v1"
+	chat "google.golang.org/api/chat/v1"
 	docs "google.golang.org/api/docs/v1"
 	drive "google.golang.org/api/drive/v3"
 	gmail "google.golang.org/api/gmail/v1"
-	chat "google.golang.org/api/chat/v1"
 	"google.golang.org/api/impersonate"
 	keep "google.golang.org/api/keep/v1"
 	"google.golang.org/api/option"
@@ -60,6 +60,19 @@ func main() {
 			sheets.SpreadsheetsScope,
 			drive.DriveReadonlyScope,
 			gmail.GmailModifyScope,
+			"https://www.googleapis.com/auth/chat.spaces.create",
+		},
+	})
+	if err != nil {
+		log.Fatalf("Failed to create token source: %v", err)
+	}
+
+	// 3b. Create the Bot Token Source for Chat App (acting as the bot, not the user)
+	chatBotTs, err := impersonate.CredentialsTokenSource(ctx, impersonate.CredentialsConfig{
+		TargetPrincipal: serviceAccountEmail,
+		// No Subject field. This ensures we authenticate as the application itself.
+		Scopes: []string{
+			"https://www.googleapis.com/auth/chat.bot",
 			"https://www.googleapis.com/auth/chat.messages.create",
 			"https://www.googleapis.com/auth/chat.spaces.create",
 		},
@@ -99,13 +112,18 @@ func main() {
 		log.Fatalf("Failed to create Gmail service: %v", err)
 	}
 
-	chatSvc, err := chat.NewService(ctx, option.WithTokenSource(ts))
+	chatUserSvc, err := chat.NewService(ctx, option.WithTokenSource(ts))
 	if err != nil {
-		log.Fatalf("Failed to create Chat service: %v", err)
+		log.Fatalf("Failed to create Chat User service: %v", err)
+	}
+
+	chatBotSvc, err := chat.NewService(ctx, option.WithTokenSource(chatBotTs))
+	if err != nil {
+		log.Fatalf("Failed to create Chat Bot service: %v", err)
 	}
 
 	// 5. Initialize internal workspace wrapper
-	ws := workspace.NewService(adminSvc, keepSvc, docsSvc, sheetsSvc, driveSvc, gmailSvc, chatSvc)
+	ws := workspace.NewService(adminSvc, keepSvc, docsSvc, sheetsSvc, driveSvc, gmailSvc, chatUserSvc, chatBotSvc)
 
 	// 6. Verification check
 	user, err := ws.GetUser(userEmail)
