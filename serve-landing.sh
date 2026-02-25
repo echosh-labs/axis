@@ -6,6 +6,25 @@ LANDING_DIR="$ROOT_DIR/landing"
 DIST_DIR="$LANDING_DIR/dist"
 HTML_FILE="$LANDING_DIR/index.html"
 PORT="8888"
+NOBUILD=0
+
+# Simple CLI
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -p|--port)
+            PORT="$2"; shift 2;;
+        --no-build)
+            NOBUILD=1; shift;;
+        -h|--help)
+            cat <<EOF
+Usage: $(basename "$0") [-p PORT] [--no-build]
+    -p, --port    Port to serve (default: 8888)
+    --no-build    Skip npm install/build steps and just serve existing files
+EOF
+            exit 0;;
+        *) echo "Unknown arg: $1"; exit 2;;
+    esac
+done
 
 if [[ ! -d "$LANDING_DIR" ]]; then
     echo "Landing directory not found at $LANDING_DIR" >&2
@@ -14,27 +33,37 @@ fi
 
 cd "$LANDING_DIR"
 
-if [[ ! -d node_modules ]]; then
-    echo "Installing landing dependencies..."
-    npm install
-fi
+if [[ $NOBUILD -eq 0 ]]; then
+    if [[ ! -d node_modules ]]; then
+        echo "Installing landing dependencies..."
+        npm install
+    fi
 
-echo "Building Tailwind bundle..."
-npm run build >/dev/null
+    echo "Building Tailwind bundle..."
+    if ! npm run build >/dev/null; then
+        echo "npm build failed; ensure Node and Tailwind are installed" >&2
+        exit 1
+    fi
 
-CSS_FILE="$DIST_DIR/landing.css"
-if [[ ! -f "$CSS_FILE" ]]; then
-    echo "Expected CSS at $CSS_FILE after build" >&2
-    exit 1
-fi
+    CSS_FILE="$DIST_DIR/landing.css"
+    if [[ ! -f "$CSS_FILE" ]]; then
+        echo "Expected CSS at $CSS_FILE after build" >&2
+        exit 1
+    fi
 
-HASH=$(openssl dgst -sha384 -binary "$CSS_FILE" | base64)
-SHORT_HASH="${HASH:0:8}"
-HASHED_CSS="$DIST_DIR/landing.${SHORT_HASH}.css"
+    # compute SHA384 base64; prefer openssl, fallback to sha384sum
+    if command -v openssl >/dev/null 2>&1; then
+        HASH=$(openssl dgst -sha384 -binary "$CSS_FILE" | base64)
+    else
+        HASH=$(sha384sum "$CSS_FILE" | awk '{print $1}' | xxd -r -p | base64)
+    fi
+    SHORT_HASH="${HASH:0:8}"
+    HASHED_CSS="$DIST_DIR/landing.${SHORT_HASH}.css"
 
-mv "$CSS_FILE" "$HASHED_CSS"
+    # move into place (force overwrite if exists)
+    mv -f "$CSS_FILE" "$HASHED_CSS"
 
-python3 - "$HTML_FILE" "$SHORT_HASH" "$HASH" <<'PY'
+    python3 - "$HTML_FILE" "$SHORT_HASH" "$HASH" <<'PY'
 import sys, re, pathlib
 html_path = pathlib.Path(sys.argv[1])
 short_hash = sys.argv[2]
@@ -49,6 +78,25 @@ if html == updated:
     print("Warning: link tag not updated; pattern not found", file=sys.stderr)
 html_path.write_text(updated)
 PY
+fi
 
-echo "Serving landing/ at http://localhost:${PORT} (Ctrl+C to stop)..."
-python3 -m http.server "$PORT" --directory "$LANDING_DIR"
+echo "Serving landing/ at http://localhost:${PORT} (Ctrl+C to stop...)"
+# bind to localhost explicitly for safety
+if command -v python3 >/dev/null 2>&1; then
+    # Ensure bucky-ball/vertices.json exists for the viewer; try to generate if missing
+    BALL_DIR="$LANDING_DIR/bucky-ball"
+    JSON_FILE="$BALL_DIR/vertices.json"
+    if [[ ! -f "$JSON_FILE" ]]; then
+        if command -v go >/dev/null 2>&1; then
+            echo "Generating $JSON_FILE from Go program..."
+            (cd "$BALL_DIR" && go run main.go -json vertices.json) || echo "Warning: failed to generate vertices.json"
+        else
+            echo "go tool not found; viewer may fail without $JSON_FILE"
+        fi
+    fi
+
+    python3 -m http.server "$PORT" --bind 127.0.0.1 --directory "$LANDING_DIR"
+else
+    echo "python3 not found; cannot start simple HTTP server" >&2
+    exit 1
+fi

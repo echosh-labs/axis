@@ -8,6 +8,7 @@ import RegistryList from './components/RegistryList.jsx';
 import DetailPanel from './components/DetailPanel.jsx';
 import ShortcutsFooter from './components/ShortcutsFooter.jsx';
 import HelpOverlay from './components/HelpOverlay.jsx';
+import ThreeDOverlay from './components/ThreeDOverlay.jsx';
 import { useRegistry } from './hooks/useRegistry.js';
 import { useHotkeys } from './hooks/useHotkeys.js';
 
@@ -241,6 +242,7 @@ const App = () => {
 
     return (
         <div className="flex flex-col h-screen p-4 select-text relative outline-none" tabIndex="0">
+            <ThreeDOverlay />
             <HelpOverlay isOpen={showHelp} onClose={() => setShowHelp(false)} />
             <HeaderBar
                 user={user}
