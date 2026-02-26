@@ -31,9 +31,10 @@ func TestNewService(t *testing.T) {
 	sheetsSvc := &sheets.Service{}
 	driveSvc := &drive.Service{}
 	gmailSvc := &gmail.Service{}
-	chatSvc := &chat.Service{}
+	chatUserSvc := &chat.Service{}
+	chatBotSvc := &chat.Service{}
 
-	ws := NewService(adminSvc, keepSvc, docsSvc, sheetsSvc, driveSvc, gmailSvc, chatSvc)
+	ws := NewService(adminSvc, keepSvc, docsSvc, sheetsSvc, driveSvc, gmailSvc, chatUserSvc, chatBotSvc)
 
 	if ws.adminService != adminSvc {
 		t.Error("Admin service not correctly assigned")
@@ -53,8 +54,11 @@ func TestNewService(t *testing.T) {
 	if ws.gmailService != gmailSvc {
 		t.Error("Gmail service not correctly assigned")
 	}
-	if ws.chatService != chatSvc {
-		t.Error("Chat service not correctly assigned")
+	if ws.chatUserSvc != chatUserSvc {
+		t.Error("Chat user service not correctly assigned")
+	}
+	if ws.chatBotSvc != chatBotSvc {
+		t.Error("Chat bot service not correctly assigned")
 	}
 }
 
@@ -82,7 +86,7 @@ func TestListRegistryItems(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ws := NewService(nil, keepSvc, nil, nil, driveSvc, nil, nil)
+	ws := NewService(nil, keepSvc, nil, nil, driveSvc, nil, nil, nil)
 	items, err := ws.ListRegistryItems()
 	if err != nil {
 		t.Fatal(err)
